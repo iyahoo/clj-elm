@@ -1,5 +1,6 @@
 (ns clj-elm.core-test
   (:require [clj-elm.core :refer :all]
+            [clj-elm.data :refer [australian normalize get-features]]
             ;; [clojure.core.typed :as t :only [atom doseq let fn defn ref dotimes defprotocol loop for]]
             ;; [clojure.core.typed :refer :all :exclude [atom doseq let fn defn ref dotimes defprotocol loop for]]
             [midje.sweet :refer :all]
@@ -85,3 +86,8 @@
                               (c/mmult (pseudo-inverse-matrix (c/trans C)) C)))
       => (c/identity-matrix 3))))
 
+(facts "test-train-model-and-predict"
+  (fact "(train-model dataset l) (predict model xs)"
+    (let [model (train-model (normalize australian) 20)]
+      (predict model (get-features (first (c/to-vect (normalize australian)))))
+      => -1)))

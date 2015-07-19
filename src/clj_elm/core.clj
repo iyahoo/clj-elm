@@ -1,5 +1,6 @@
 (ns clj-elm.core
   (:require [clojure.repl :refer [doc]]
+            [clj-elm.data :refer [num-of-feature get-features normalize class-label australian]]
             ;; [clojure.core.typed :as t :only [atom doseq let fn defn ref dotimes defprotocol loop for]]
             ;; [clojure.core.typed :refer :all :exclude [atom doseq let fn defn ref dotimes defprotocol loop for]]
             [incanter.core :as c :exclude [update]]))
@@ -21,7 +22,8 @@
   "Make a d-dimension-random-feature vector. d is number of dimention of
    feature. All elements are in [-1,1]"
   ([d]
-   {:pre [(integer? d)]}
+   {:pre [(integer? d)]
+    :post [(= (count %) d)]}
    (take d (repeatedly #(dec (rand 2))))))
 
 ;; (ann make-as [Int Int -> (Seqable Number)])
@@ -82,8 +84,25 @@
                    (c/solve)
                    (c/mmult matrix))))))
 
-(defn output [betas ass bs xs]
-  (-> (map #(* %1 (a-hidden-layer-output %2 %3 xs)) betas ass bs)
-      (c/sum)
-      (sign)))
+(defrecord Model [ass bs betas])
 
+(defn predict
+  ([ass bs betas xs]
+   {:pre [(coll? ass) (coll? (first ass)) (coll? bs) (coll? betas) (coll? xs)]}
+   (-> (map #(* %1 (a-hidden-layer-output %2 %3 xs)) betas ass bs)
+       (c/sum)
+       (sign)))
+  ([^Model model xs]
+   {:pre [(instance? Model model) (coll? xs)]}
+   (predict (.ass model) (.bs model) (.betas model) xs)))
+
+(defn train-model [dataset l]
+  (let [d (num-of-feature dataset)
+        L l
+        ass (make-ass d L)
+        bs (make-bs L)
+        xss (map get-features (c/to-vect (normalize dataset)))
+        H (hidden-layer-output-matrix ass bs xss)
+        T (class-label dataset)
+        betas (c/to-vect (c/mmult (pseudo-inverse-matrix H) T))]
+    (Model. ass bs betas)))

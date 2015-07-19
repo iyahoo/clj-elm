@@ -1,6 +1,6 @@
 (ns clj-elm.main
   (:require [clojure.repl :refer [doc]]
-            [clj-elm.core :refer [make-ass make-bs hidden-layer-output-matrix pseudo-inverse-matrix output]]
+            [clj-elm.core :refer [make-ass make-bs hidden-layer-output-matrix pseudo-inverse-matrix predict]]
             [clj-elm.data :refer [num-of-feature get-features normalize class-label]]
             [incanter.io :as io]
             [incanter.core :refer [to-vect matrix mmult]]
@@ -18,4 +18,4 @@
         H (hidden-layer-output-matrix ass bs xss)
         T (class-label dataset)
         betas (to-vect (mmult (pseudo-inverse-matrix H) T))]
-    (map #(output betas ass bs %) xss)))
+    (map #(predict ass bs betas %) xss)))
