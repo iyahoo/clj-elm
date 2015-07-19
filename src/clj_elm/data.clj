@@ -2,7 +2,11 @@
   (:require [clojure.repl :refer [doc]]
             [incanter.datasets :as da]
             [incanter.core :as c]
-            [incanter.stats :as st]))
+            [incanter.stats :as st]
+            [incanter.io :as io]))
+
+(def australian
+  (io/read-dataset "data/australian.csv" :delim \, :header true))
 
 (defn num-of-feature 
   ([dataset]
@@ -17,12 +21,12 @@
 (defn get-features 
   ([line]
    {:pre [(coll? line)]}
-   (rest line)))
+   (butlast line)))
 
 (defn class-label 
   ([dataset]
    {:pre [(or (c/matrix? dataset) (c/dataset? dataset))]}
-   (map int (c/to-vect (c/$ :all 0 dataset)))))
+   (map int (c/to-vect (c/$ :all 14 dataset)))))
 
 (defn ith-feature-list 
   ([dataset i]
@@ -34,9 +38,10 @@
    {:pre [(or (c/matrix? dataset) (c/dataset? dataset))]}
    (let [fnum (num-of-feature dataset)
          clabel (class-label dataset)]
-     (->> (range 1 (inc fnum))
+     (->> (range 0 fnum)
           (map #(f (ith-feature-list dataset %)))
-          (cons n)))))
+          (vec)
+          (#(conj % n))))))
 
 (defn each-ith-mean 
   ([dataset]

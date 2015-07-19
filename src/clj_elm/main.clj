@@ -1,21 +1,23 @@
 (ns clj-elm.main
   (:require [clojure.repl :refer [doc]]
-            [clj-elm.core :as core]
-            [clj-elm.data :as data]
+            [clj-elm.core :refer [make-ass make-bs hidden-layer-output-matrix pseudo-inverse-matrix output]]
+            [clj-elm.data :refer [num-of-feature get-features normalize class-label]]
             [incanter.io :as io]
-            [incanter.core :as c]
+            [incanter.core :refer [to-vect matrix mmult]]
             [incanter.stats :as st]))
 
 (def australian
   (io/read-dataset "data/australian.csv" :delim \, :header true))
 
 (defn -main [dataset]
-  (let [d (data/num-of-feature dataset)
+  (let [d (num-of-feature dataset)
         L 20
-        ass (core/make-ass d L)
-        bs (core/make-bs L)
-        xss (map data/get-features (c/to-vect (data/normalize dataset)))
-        H (core/hidden-layer-output-matrix ass bs xss)
-        T (data/class-label dataset)
-        betas (c/to-vect (c/mmult (core/pseudo-inverse-matrix H) T))]
-    (map #(core/output betas ass bs %) xss)))
+        ass (make-ass d L)
+        bs (make-bs L)
+        xss (map get-features (to-vect (normalize dataset)))
+        H (hidden-layer-output-matrix ass bs xss)
+        T (class-label dataset)
+        betas (to-vect (mmult (pseudo-inverse-matrix H) T))]
+    (do (println (matrix H))
+        (println betas))
+    (map #(output betas ass bs %) xss)))

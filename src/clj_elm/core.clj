@@ -51,7 +51,7 @@
    Xs is d-dimension."
   ([as_i b_i xs]
    {:pre [(coll? as_i) (number? b_i) (coll? xs)]}
-   (g (+ (c/sel (c/mmult (c/trans xs) as_i) 0 0)
+   (g (+ (c/inner-product as_i xs)
          b_i))))
 
 (defn hidden-layer-output-matrix 
@@ -72,13 +72,18 @@
          p (c/ncol matrix)]
      (cond
        (= n p) (c/solve matrix)
-       (> n p) (c/mmult (c/solve (c/mmult (c/trans matrix)
-                                          matrix))
-                        (c/trans matrix))
-       (< n p) (c/mmult (c/solve (c/mmult matrix
-                                          (c/trans matrix)))
-                        matrix)))))
+       (> n p) (-> matrix
+                   (c/trans)
+                   (c/mmult matrix)
+                   (c/solve)
+                   (c/mmult (c/trans matrix)))
+       (< n p) (-> matrix
+                   (c/mmult (c/trans matrix))
+                   (c/solve)
+                   (c/mmult matrix))))))
 
 (defn output [betas ass bs xs]
-  (let [x (c/sum (map #(* %1 (a-hidden-layer-output %2 %3 xs)) betas ass bs))]
-    (sign x)))
+  (-> (map #(* %1 (a-hidden-layer-output %2 %3 xs)) betas ass bs)
+      (c/sum)
+      (sign)))
+

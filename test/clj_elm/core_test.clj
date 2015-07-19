@@ -8,11 +8,11 @@
 
 (facts "test-sign"
   (fact "(sign x)"
-    (sign 100)      => 1
-    (sign 0.1)      => 1
+    (sign 100)      =>  1
+    (sign 0.1)      =>  1
     (sign -100)     => -1
     (sign -0.00001) => -1
-    (sign 0)        => 0))
+    (sign 0)        =>  0))
 
 (facts "test-make-weights"
   (fact "(make-weights d)"
