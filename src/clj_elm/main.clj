@@ -18,6 +18,4 @@
         H (hidden-layer-output-matrix ass bs xss)
         T (class-label dataset)
         betas (to-vect (mmult (pseudo-inverse-matrix H) T))]
-    (do (println (matrix H))
-        (println betas))
     (map #(output betas ass bs %) xss)))
