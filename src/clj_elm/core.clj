@@ -98,29 +98,13 @@
    {:pre [(instance? Model model) (coll? xs)]}
    (predict (.ass model) (.bs model) (.betas model) xs)))
 
-(defmulti train-model (fn [dataset _ _] (class dataset)))
-
 (defn train-model [dataset L cidx]
-  (let [d (data/num-of-feature dataset)
+  (let [d (dec (data/num-of-feature dataset))
         ass (make-ass d L)
         bs (make-bs L)
         data (data/data-set dataset cidx)
-        xss (c/to-vect (data/normalize (c/to-dataset (.features data))))
+        xss (c/to-vect (data/normalize (.features data)))
         H (hidden-layer-output-matrix ass bs xss)
         T (.classes data)
         betas (c/to-vect (c/mmult (pseudo-inverse-matrix H) T))]
     (Model. ass bs betas)))
-
-;; (defmethod train-model incanter.core.Dataset [dataset L cidx]
-;;   (let [d (data/num-of-feature dataset)
-;;         ass (make-ass d L)
-;;         bs (make-bs L)
-;;         data (data/data-set dataset cidx)
-;;         xss (c/to-vect (data/normalize (c/to-dataset (.features data))))
-;;         H (hidden-layer-output-matrix ass bs xss)
-;;         T (.classes data)
-;;         betas (c/to-vect (c/mmult (pseudo-inverse-matrix H) T))]
-;;     (Model. ass bs betas)))
-
-
-

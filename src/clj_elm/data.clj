@@ -63,5 +63,4 @@
          sds (each-ith-sd dataset)]    
      (->> (c/to-vect dataset)
           (map #(map - % means))
-          (map #(map / % sds))
-          (c/to-dataset)))))
+          (map #(map / % sds))))))
