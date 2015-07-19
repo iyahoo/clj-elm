@@ -14,9 +14,9 @@
         L 20
         ass (core/make-ass d L)
         bs (core/make-bs L)
-        xss (map data/get-features (data/normalize dataset))
+        xss (map data/get-features ;; (data/normalize dataset)
+                 dataset)
         H (core/hidden-layer-output-matrix ass bs xss)
-        T (data/get-class-label dataset)
+        T (data/class-label dataset)
         betas (c/to-vect (c/mmult (core/pseudo-inverse-matrix H) T))]
-    (do (println betas))
     (map #(core/output betas ass bs %) xss)))
