@@ -1,9 +1,11 @@
 (ns clj-elm.core
   (:require [clojure.repl :refer [doc]]
-            [clj-elm.data :refer [num-of-feature get-features normalize class-label australian]]
+            [clj-elm.data :as data]            
             ;; [clojure.core.typed :as t :only [atom doseq let fn defn ref dotimes defprotocol loop for]]
             ;; [clojure.core.typed :refer :all :exclude [atom doseq let fn defn ref dotimes defprotocol loop for]]
-            [incanter.core :as c :exclude [update]]))
+            [incanter.core :as c :exclude [update]])
+  ;; (:import [clj_elm.data.DataSet])
+  )
 
 ;; (ann sign [Num -> Int])
 (defn sign
@@ -96,13 +98,29 @@
    {:pre [(instance? Model model) (coll? xs)]}
    (predict (.ass model) (.bs model) (.betas model) xs)))
 
-(defn train-model [dataset l]
-  (let [d (num-of-feature dataset)
-        L l
+(defmulti train-model (fn [dataset _ _] (class dataset)))
+
+(defn train-model [dataset L cidx]
+  (let [d (data/num-of-feature dataset)
         ass (make-ass d L)
         bs (make-bs L)
-        xss (map get-features (c/to-vect (normalize dataset)))
+        data (data/data-set dataset cidx)
+        xss (c/to-vect (data/normalize (c/to-dataset (.features data))))
         H (hidden-layer-output-matrix ass bs xss)
-        T (class-label dataset)
+        T (.classes data)
         betas (c/to-vect (c/mmult (pseudo-inverse-matrix H) T))]
     (Model. ass bs betas)))
+
+;; (defmethod train-model incanter.core.Dataset [dataset L cidx]
+;;   (let [d (data/num-of-feature dataset)
+;;         ass (make-ass d L)
+;;         bs (make-bs L)
+;;         data (data/data-set dataset cidx)
+;;         xss (c/to-vect (data/normalize (c/to-dataset (.features data))))
+;;         H (hidden-layer-output-matrix ass bs xss)
+;;         T (.classes data)
+;;         betas (c/to-vect (c/mmult (pseudo-inverse-matrix H) T))]
+;;     (Model. ass bs betas)))
+
+
+

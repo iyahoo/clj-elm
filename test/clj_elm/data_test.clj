@@ -11,18 +11,25 @@
 (def australians
   (io/read-dataset "data/australian.csv" :delim \, :header true))
 
-(def A (c/to-dataset [[1 1 1 1] [1 1 1 1] [1 1 1 1]]))
-(def B (c/to-dataset [[10 20 0] [0 40 0] [20 50 0] [-10 10 1]]))
+(def A [[1 1 1 1] [1 1 1 1] [1 1 1 1]])
+(def B [[10 20 0] [0 40 0] [20 50 0] [-10 10 0]])
 
 (facts "test-num-of-feature"
   (fact "(num-of-feature dataset)"
-    (num-of-feature australians) => 14
-    (num-of-feature A) => 3))
+    (dec (num-of-feature australians)) => 14
+    (num-of-feature (c/to-dataset A)) => 4))
 
 (facts "test-num-of-data"
   (fact "(num-of-data dataset)"
     (num-of-data australians) => 690
-    (num-of-data A) => 3))
+    (num-of-data (c/to-dataset A)) => 3))
+
+(facts "test-data-set"
+  (fact "(data-set data cidx)"
+    (take 5 (:classes (data-set australian 14)))
+    => [-1 -1 -1 1 1]
+    (take 5 (first (:features (data-set australian 14))))
+    => [1 22.08 11.46 2 4]))
 
 (facts "test-class-label"
   (fact "(class-label dataset)"
@@ -53,30 +60,30 @@
 
 (facts "test-each-ith-mean"
   (fact "(each-ith-mean dataset)"
-    (take 3 (each-ith-mean australians))
+    (take 3 (each-ith-mean (.features (data-set australians 14))))
     => [0.6782608695652174 31.56820289855064 4.758724637681158]
-    (count (each-ith-mean australians))
-    => 15
+    (count (each-ith-mean (.features (data-set australians 14))))
+    => 14
     (each-ith-mean A)
-    => [1.0 1.0 1.0 0]
+    => [1.0 1.0 1.0 1.0]
     (each-ith-mean B)
-    => [5.0 30.0 0]))
+    => [5.0 30.0 0.0]))
 
 (facts "test-each-ith-sd"
   (fact "(each-ith-sd dataset)"
-    (take 3 (each-ith-sd australians))
+    (take 3 (each-ith-sd (.features (data-set australians 14))))
     => [0.46748239187205504 11.853272772971627 4.978163248528541]))
 
 (facts "test-normalize"
-  (fact "(normalize dataset)"
-    (->> (range 1 (inc (num-of-feature australians)))
-         (map #(ith-feature-list (normalize australians) %))
-         (map st/mean)
-         (map #(Math/round %)))
-    => (repeat (num-of-feature australians) 0)
-    (->> (range 1 (inc (num-of-feature australians)))
-         (map #(ith-feature-list (normalize australians) %))
+  (let [features (.features (data-set australians 14))]
+    (fact "(normalize dataset)"
+      (->> (range 0 (num-of-feature features))
+           (map #(ith-feature-list (normalize features) %))
+           (map st/mean)
+           (map #(Math/round %)))
+      => (repeat (num-of-feature features) 0))
+    (->> (range 0 (num-of-feature features))
+         (map #(ith-feature-list (normalize features) %))
          (map st/sd)
          (map #(Math/round %)))
-    => (repeat (num-of-feature australians) 1)))
-
+    => (repeat (num-of-feature features) 1)))

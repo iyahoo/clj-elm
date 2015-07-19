@@ -10,13 +10,21 @@
 
 (defn num-of-feature 
   ([dataset]
-   {:pre [(or (c/matrix? dataset) (c/dataset? dataset))]}
-   (dec (c/ncol dataset))))
+   {:pre [(coll? dataset)]}
+   (c/ncol (c/to-dataset dataset))))
 
 (defn num-of-data 
   ([dataset]
    {:pre [(or (c/matrix? dataset) (c/dataset? dataset))]}
    (c/nrow dataset)))
+
+(defrecord DataSet [classes features])
+
+(defn data-set
+  "Make DataSet from incanter-form dataset. Cidx is row number of class."
+  ([^incanter.core.Dataset dataset cidx]
+   {:pre [(c/dataset? dataset)]}
+   (DataSet. (map int (c/to-vect (c/$ :all cidx dataset))) (c/to-vect (c/$ [:not cidx] dataset)))))
 
 (defn get-features 
   ([line]
@@ -30,31 +38,27 @@
 
 (defn ith-feature-list 
   ([dataset i]
-   {:pre [(or (c/matrix? dataset) (c/dataset? dataset))]}
-   (c/$ i dataset)))
+   {:pre [(coll? dataset)]}
+   (c/$ i (c/to-dataset dataset))))
 
 (defn each-ith-f 
-  ([f dataset n]
-   {:pre [(or (c/matrix? dataset) (c/dataset? dataset))]}
-   (let [fnum (num-of-feature dataset)
-         clabel (class-label dataset)]
-     (->> (range 0 fnum)
-          (map #(f (ith-feature-list dataset %)))
-          (vec)
-          (#(conj % n))))))
+  ([f dataset]
+   {:pre [(coll? dataset)]}
+   (->> (range 0 (count (first dataset)))
+        (map #(f (ith-feature-list dataset %)))
+        (vec))))
 
 (defn each-ith-mean 
   ([dataset]
-   (each-ith-f st/mean dataset 0)))
+   (each-ith-f st/mean dataset)))
 
 (defn each-ith-sd 
   ([dataset]
-   (each-ith-f st/sd dataset 1)))
+   (each-ith-f st/sd dataset)))
 
 (defn normalize 
   ([dataset]
-   {:pre [(or (c/matrix? dataset) (c/dataset? dataset))]
-    :post [(= (count %))]}
+   {:pre [(coll? dataset)]}
    (let [means (each-ith-mean dataset)
          sds (each-ith-sd dataset)]    
      (->> (c/to-vect dataset)

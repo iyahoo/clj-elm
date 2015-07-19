@@ -86,8 +86,8 @@
                               (c/mmult (pseudo-inverse-matrix (c/trans C)) C)))
       => (c/identity-matrix 3))))
 
-(facts "test-train-model-and-predict"
-  (fact "(train-model dataset l) (predict model xs)"
-    (let [model (train-model (normalize australian) 20)]
-      (predict model (get-features (first (c/to-vect (normalize australian)))))
-      => -1)))
+;; (facts "test-train-model-and-predict"
+;;   (fact "(train-model dataset l) (predict model xs)"
+;;     (let [model (train-model australian 20 14)]
+;;       (predict model (get-features (first (c/to-vect (normalize australian)))))
+;;       => -1)))
