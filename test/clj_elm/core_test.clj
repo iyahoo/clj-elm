@@ -1,11 +1,16 @@
 (ns clj-elm.core-test
   (:require [clj-elm.core :refer :all]
-            [clj-elm.data :refer [australian normalize get-features data-set]]
+            [clj-elm.data :as data :refer [normalize get-features data-set]]
             ;; [clojure.core.typed :as t :only [atom doseq let fn defn ref dotimes defprotocol loop for]]
             ;; [clojure.core.typed :refer :all :exclude [atom doseq let fn defn ref dotimes defprotocol loop for]]
             [midje.sweet :refer :all]
             [midje.repl :refer (autotest load-facts)]
-            [incanter.core :as c :exclude [update]]))
+            [incanter.core :as c :exclude [update]]
+            [incanter.io :as io]
+            [svm.core :as svm]))
+
+(def australian
+  (data/read-dataset "data/australian.csv" 14))
 
 (facts "test-sign"
   (fact "(sign x)"
@@ -88,6 +93,6 @@
 
 (facts "test-train-model-and-predict"
   (fact "(train-model dataset l) (predict model xs)"
-    (let [model (train-model australian 20 14)]
-      (predict model (first (normalize (.features (data-set australian 14)))))
+    (let [model (train-model australian 20)]
+      (predict model (first (normalize (:features australian))))
       => -1)))

@@ -96,15 +96,14 @@
        (sign)))
   ([^Model model xs]
    {:pre [(instance? Model model) (coll? xs)]}
-   (predict (.ass model) (.bs model) (.betas model) xs)))
+   (predict (:ass model) (:bs model) (:betas model) xs)))
 
-(defn train-model [dataset L cidx]
-  (let [d (dec (data/num-of-feature dataset))
+(defn train-model [dataset L]
+  (let [d (data/num-of-feature dataset)
         ass (make-ass d L)
         bs (make-bs L)
-        data (data/data-set dataset cidx)
-        xss (c/to-vect (data/normalize (.features data)))
+        xss (data/normalize (:features dataset))
         H (hidden-layer-output-matrix ass bs xss)
-        T (.classes data)
+        T (:classes dataset)
         betas (c/to-vect (c/mmult (pseudo-inverse-matrix H) T))]
     (Model. ass bs betas)))

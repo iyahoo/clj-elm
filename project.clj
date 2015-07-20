@@ -10,4 +10,5 @@
                  [org.clojure/tools.nrepl "0.2.10"]
                  [org.clojure/core.typed "0.3.0"]
                  [incanter "1.5.6"]
-                 [midje "1.7.0-beta1"]])
+                 [midje "1.7.0-beta1"]
+                 [svm-clj "0.1.3"]])

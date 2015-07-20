@@ -3,38 +3,48 @@
             [incanter.datasets :as da]
             [incanter.core :as c]
             [incanter.stats :as st]
-            [incanter.io :as io]))
+            [incanter.io :as io]
+            [svm.core :as svm]))
 
-(def australian
-  (io/read-dataset "data/australian.csv" :delim \, :header true))
+(io/read-dataset "data/australian.csv" :delim \, :header true)
+
+(defrecord DataSet [classes features])
+
+(defn parse-lib-svm-data [line]
+  {:pre [(integer? (first line)) (map? (last line))]}
+  (let [[class featmap] line
+        fnum (count featmap)
+        features (map #(get featmap %) (range 1 (inc fnum)))]
+    [class features]))
+
+(defn data-set
+  "Make DataSet from incanter-form (csv) dataset. Cidx is column number of class."
+  ([^incanter.core.Dataset dataset cidx]
+   {:pre [(c/dataset? dataset)]}
+   (DataSet. (map int (c/to-vect (c/$ :all cidx dataset))) (c/to-vect (c/$ [:not cidx] dataset)))))
+
+(defn read-dataset
+  ([path cidx]
+   {:pre [(string? path) (integer? cidx)]}   
+   (-> (io/read-dataset path :delim \, :header true)
+       (data-set cidx))))
+
+(defn read-dataset-lib-svm
+  ([path]
+   {:pre [(string? path)]}
+   (->> (svm/read-dataset path)
+        (map parse-lib-svm-data)
+        (#(DataSet. (map first %) (map second %))))))
 
 (defn num-of-feature 
   ([dataset]
    {:pre [(coll? dataset)]}
-   (c/ncol (c/to-dataset dataset))))
-
-(defn num-of-data 
-  ([dataset]
-   {:pre [(or (c/matrix? dataset) (c/dataset? dataset))]}
-   (c/nrow dataset)))
-
-(defrecord DataSet [classes features])
-
-(defn data-set
-  "Make DataSet from incanter-form dataset. Cidx is row number of class."
-  ([^incanter.core.Dataset dataset cidx]
-   {:pre [(c/dataset? dataset)]}
-   (DataSet. (map int (c/to-vect (c/$ :all cidx dataset))) (c/to-vect (c/$ [:not cidx] dataset)))))
+   (count (first (:features dataset)))))
 
 (defn get-features 
   ([line]
    {:pre [(coll? line)]}
    (butlast line)))
-
-(defn class-label 
-  ([dataset]
-   {:pre [(or (c/matrix? dataset) (c/dataset? dataset))]}
-   (map int (c/to-vect (c/$ :all 14 dataset)))))
 
 (defn ith-feature-list 
   ([dataset i]
