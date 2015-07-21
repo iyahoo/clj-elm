@@ -74,3 +74,13 @@
      (->> (c/to-vect dataset)
           (map #(map - % means))
           (map #(map / % sds))))))
+
+(defn remove-list
+  ([lst a b]
+   {:pre [(coll? lst) (integer? a) (integer? b)]}
+   (concat (take a lst) (drop (inc b) lst))))
+
+(defn extract-list
+  ([lst a b]
+   {:pre [(coll? lst) (integer? a) (integer? b)]}
+   (take (inc (- b a)) (drop a lst))))

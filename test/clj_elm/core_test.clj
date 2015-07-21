@@ -12,6 +12,9 @@
 (def australian
   (data/read-dataset "data/australian.csv" 14))
 
+(def libsvmlian
+  (data/read-dataset-lib-svm "data/australian"))
+
 (facts "test-sign"
   (fact "(sign x)"
     (sign 100)      =>  1
@@ -61,7 +64,7 @@
         [0.5 0.5 0.5]
         [0.5 0.5 0.5]]))
 
-(defn roundn [x n]
+(defn roundn [^Double x ^Integer n]
   (-> (BigDecimal. x)
       (.setScale n BigDecimal/ROUND_HALF_UP)))
 
@@ -95,4 +98,16 @@
   (fact "(train-model dataset l) (predict model xs)"
     (let [model (train-model australian 20)]
       (predict model (first (normalize (:features australian))))
+      => -1)
+    (let [model (train-model libsvmlian 20)]
+      (predict model (first (normalize (:features libsvmlian))))
       => -1)))
+
+(facts "test-evaluation"
+  (facts "(evaluation results facts)"
+    (evaluation [1 1 1 1 1 1 1 1 1 1] [1 1 1 1 1 1 1 1 1 1])
+    => 1
+    (evaluation [-1 -1 -1 -1 -1 1 1 1 1 1] [1 1 1 1 1 1 1 1 1 1])
+    => 1/2
+    (evaluation [-1 -1 -1 -1 -1 -1 -1 -1 -1 1] [1 1 1 1 1 1 1 1 1 1])
+    => 1/10))

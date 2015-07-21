@@ -24,7 +24,7 @@
 
 (facts "test-parse-lib-svm-data"
   (fact "(parse-lib-svm-data line)"
-    (parse-lib-svm-data (first libsvmlian))
+    (parse-lib-svm-data (first (svm/read-dataset "data/australian")))
     => [-1 [1.0 22.08 11.46 2.0 4.0 4.0 1.585 0.0 0.0 0.0 1.0 2.0 100.0 1213.0]]))
 
 (facts "test-read-dataset-lib-svm"
@@ -71,21 +71,21 @@
     (ith-feature-list A 1)
     => [1 1 1]))
 
+(facts "test-each-ith-sd"
+  (facts "(each-ith-sd dataset)"
+    (take 3 (each-ith-sd (:features (data-set australian 14))))
+    => [0.46748239187205504 11.853272772971627 4.978163248528541]))
+
 (facts "test-each-ith-mean"
   (facts "(each-ith-mean dataset)"
-    (take 3 (each-ith-mean (.features (data-set australian 14))))
+    (take 3 (each-ith-mean (:features (data-set australian 14))))
     => [0.6782608695652174 31.56820289855064 4.758724637681158]
-    (count (each-ith-mean (.features (data-set australian 14))))
+    (count (each-ith-mean (:features (data-set australian 14))))
     => 14
     (each-ith-mean A)
     => [1.0 1.0 1.0 1.0]
     (each-ith-mean B)
     => [5.0 30.0 0.0]))
-
-(facts "test-each-ith-sd"
-  (facts "(each-ith-sd dataset)"
-    (take 3 (each-ith-sd (:features (data-set australian 14))))
-    => [0.46748239187205504 11.853272772971627 4.978163248528541]))
 
 (facts "test-normalize"
   (let [features (:features (data-set australian 14))]
@@ -100,3 +100,17 @@
          (map st/sd)
          (map #(Math/round %)))
     => (repeat (num-of-feature features) 1)))
+
+(facts "test-remove-list"
+  (facts "(remove-list lst a b)"
+    (remove-list [0 1 2 3 4] 1 2)
+    => [0 3 4]
+    (remove-list [[0 0 0 0] [1 1 1 1] [2 2 2 2] [3 3 3 3] [4 4 4 4] [5 5 5 5]] 3 4)
+    => [[0 0 0 0] [1 1 1 1] [2 2 2 2] [5 5 5 5]]))
+
+(facts "test-extract-list"
+  (facts "(extract-list lst a b)"
+    (extract-list [0 1 2 3 4] 1 2)
+    => [1 2]
+    (extract-list [[0 0 0 0] [1 1 1 1] [2 2 2 2] [3 3 3 3] [4 4 4 4] [5 5 5 5]] 3 4)
+    => [[3 3 3 3] [4 4 4 4]]))
