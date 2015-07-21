@@ -122,7 +122,7 @@
                         (data/extract-list (:features dataset) a b))
          sample (DataSet. (data/remove-list (:classes dataset) a b)
                           (data/remove-list (:features dataset) a b))]
-     (dorun (println a b))
+     (dorun (println "Data" a "to" b "."))
      (-> (train-model sample L)
          (#(map (fn [feature] (predict % feature)) (:features test)))
          (evaluation (:classes test))))))
