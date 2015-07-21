@@ -115,10 +115,25 @@
           (count)
           (#(/ % numd))))))
 
+(defn _cross-validate
+  ([dataset a b L]
+   {:pre [(instance? DataSet dataset) (integer? a) (integer? b) (> b a)]}
+   (let [test (DataSet. (data/extract-list (:classes dataset) a b)
+                        (data/extract-list (:features dataset) a b))
+         sample (DataSet. (data/remove-list (:classes dataset) a b)
+                          (data/remove-list (:features dataset) a b))]
+     (dorun (println a b))
+     (-> (train-model sample L)
+         (#(map (fn [feature] (predict % feature)) (:features test)))
+         (evaluation (:classes test))))))
+
 (defn cross-validate
-  ([dataset k]
+  ([dataset k L]
    {:pre [(instance? DataSet dataset) (integer? k)]}
    (let [norm-dataset (DataSet. (:classes dataset) (data/normalize (:features dataset)))
          numd (count (:classes norm-dataset)) ; number of data
          groupn (quot numd k)]                ; number of one group's element
-     )))
+     (->> (take k (iterate #(+ % groupn) 0))
+          (map #(_cross-validate norm-dataset % (+ % (dec groupn)) L))
+          (reduce +)
+          (* (/ 1 k))))))
