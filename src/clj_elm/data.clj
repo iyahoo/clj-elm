@@ -18,9 +18,9 @@
 
 (defn ^DataSet data-set
   "Make DataSet from incanter-form or csv dataset. Cidx is column number of class."
-  ([^incanter.core.Dataset dataset cidx]
+  ([^incanter.core.Dataset dataset ^Integer cidx]
    {:pre [(c/dataset? dataset)]}
-   (DataSet. (map int (c/to-vect (c/$ :all cidx dataset))) (c/to-vect (c/$ [:not cidx] dataset)))))
+   (DataSet. (pmap int (c/to-vect (c/$ :all cidx dataset))) (c/to-vect (c/$ [:not cidx] dataset)))))
 
 (defn ^DataSet read-dataset
   ([^String path ^Integer cidx ^Boolean header]
@@ -32,7 +32,7 @@
   ([^String path]
    {:pre [(string? path)]}
    (->> (svm/read-dataset path)
-        (map parse-lib-svm-data)
+        (pmap parse-lib-svm-data)
         (#(DataSet. (map first %) (map second %))))))
 
 (defn ^DataSet concat-dataset
@@ -44,9 +44,9 @@
 (defn ^DataSet shuffle-dataset
   ([^DataSet dataset]
    {:pre [(instance? DataSet dataset)]}
-   (-> (map vector (:classes dataset) (:features dataset))
+   (-> (pmap vector (:classes dataset) (:features dataset))
        (shuffle)
-       (#(DataSet. (map first %) (map second %))))))
+       (#(DataSet. (pmap first %) (pmap second %))))))
 
 (defn ^Integer num-of-feature 
   ([^DataSet dataset]
@@ -61,7 +61,7 @@
 (defn ^clojure.lang.PersistentVector each-ith-f 
   ([f ^DataSet dataset]
    (->> (range 0 (count (first dataset)))
-        (map #(f (ith-feature-list dataset %)))
+        (pmap #(f (ith-feature-list dataset %)))
         (vec))))
 
 (defn ^clojure.lang.PersistentVector each-ith-mean 
@@ -80,8 +80,8 @@
    (let [means (each-ith-mean dataset)
          sds (each-ith-sd dataset)]    
      (->> (c/to-vect dataset)
-          (map #(map - % means))
-          (map #(map / % sds))))))
+          (pmap #(map - % means))
+          (pmap #(map / % sds))))))
 
 (defn ^clojure.lang.PersistentVector remove-list
   ([^clojure.lang.PersistentVector lst ^Integer a ^Integer b]

@@ -51,7 +51,7 @@
 (defn ^clojure.lang.PersistentVector hidden-layer-output-matrix
   "Ass is d-L-dimension. Xss is d-L-dimesion. Bs is L-dimension."
   ([^clojure.lang.PersistentVector ass ^Number bs ^clojure.lang.PersistentVector xss]
-   {:pre [(coll? ass) (coll? (first ass))
+   {:pre [(coll? ass) (coll? (first ass)) (number? (first (first ass)))
           (coll? bs) (number? (first bs))
           (coll? xss) (coll? (first xss))]
     :post [(= (count (first %)) (count ass)) (= (count %) (count xss))]}
@@ -90,22 +90,22 @@
          betas (c/to-vect (c/mmult (pseudo-inverse-matrix H) T))]
      (Model. ass bs betas))))
 
-(defn ^Integer predict
+(defn ^Integer predict  
+  ([^Model model ^clojure.lang.PersistentVector xs]
+   {:pre [(instance? Model model) (coll? xs)]}
+   (predict (:ass model) (:bs model) (:betas model) xs))
   ([^clojure.lang.PersistentVector ass ^clojure.lang.PersistentVector bs
     ^clojure.lang.PersistentVector betas ^clojure.lang.PersistentVector xs]
    {:pre [(coll? ass) (coll? (first ass)) (coll? bs) (coll? betas) (coll? xs)]}
-   (-> (map #(* %1 (a-hidden-layer-output %2 %3 xs)) betas ass bs)
+   (-> (pmap #(* %1 (a-hidden-layer-output %2 %3 xs)) betas ass bs)
        (c/sum)
-       (sign)))
-  ([^Model model ^clojure.lang.PersistentVector xs]
-   {:pre [(instance? Model model) (coll? xs)]}
-   (predict (:ass model) (:bs model) (:betas model) xs)))
+       (sign))))
 
 (defn ^Number evaluation
   ([^clojure.lang.PersistentVector results ^clojure.lang.PersistentVector facts]
    {:pre [(coll? results) (coll? facts)]}
    (let [numd (count results)]
-     (->> (map #(= %1 %2) results facts)
+     (->> (pmap #(= %1 %2) results facts)
           (filter true?)
           (count)
           (#(/ % numd))))))
@@ -119,7 +119,7 @@
                           (data/remove-list (:features dataset) a b))]
      (dorun (println (str "Data " a " to " b ".")))
      (-> (train-model sample L)
-         (#(map (fn [feature] (predict % feature)) (:features test)))
+         (#(pmap (fn [feature] (predict % feature)) (:features test)))
          (evaluation (:classes test))
          (as-> eva (do (println eva)
                        eva))))))
