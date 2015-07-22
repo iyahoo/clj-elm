@@ -64,14 +64,6 @@
         (#(= (:classes %) (:features %))))
     => true))
 
-(facts "test-get-features"
-  (facts "(get-features line)"
-    (take 2 (map get-features (c/to-vect australian)))
-    => [[1 22.08 11.46 2 4 4 1.585 0 0 0 1 2 100 1213]
-        [0 22.67     7 2 8 4 0.165 0 0 0 0 2 160    1]]
-    (get-features (last (c/to-vect australian)))
-    => [1 41 0.04 2 10 4 0.04 0 1 1 0 1 560 1]
-    (get-features (first (c/to-vect A))) => [1 1 1]))
 
 (facts "test-ith-feature-list"
   (facts "(ith-feature-list dataset i)"

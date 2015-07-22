@@ -1,6 +1,6 @@
 (ns clj-elm.core-test
   (:require [clj-elm.core :refer :all]
-            [clj-elm.data :as data :refer [normalize get-features data-set]]
+            [clj-elm.data :as data :refer [normalize data-set]]
             [midje.sweet :refer :all]
             [midje.repl :refer (autotest load-facts)]
             [incanter.core :as c :exclude [update]]

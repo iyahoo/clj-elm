@@ -4,61 +4,61 @@
             [incanter.core :as c :exclude [update]])
   (:import [clj_elm.data DataSet]))
 
-(defn sign
+(defn ^Number sign
   "The signum function for a real number x."
-  ([x]
+  ([^Number x]
    {:pre [(number? x)]}
    (cond
      (> x 0) 1
      (= x 0) 0
      :else -1)))
 
-(defn make-weights
+(defn ^clojure.lang.PersistentVector make-weights
   "Make a d-dimension-random-feature vector. d is number of dimention of
    feature. All elements are in [-1,1]"
-  ([d]
+  ([^Integer d]
    {:pre [(integer? d)]}
    (take d (repeatedly #(dec (rand 2))))))
 
-(defn make-ass
-  ([d L]
+(defn ^clojure.lang.PersistentVector make-ass
+  ([^Integer d ^Integer L]
    {:pre [(integer? d) (integer? L)]}
    (take L (repeatedly #(make-weights d)))))
 
-(defn make-bs
-  ([L]
+(defn ^clojure.lang.PersistentVector make-bs
+  ([^Integer L]
    {:pre (integer? L)}
    (take L (repeatedly #(first (make-weights 1))))))
 
-(defn standard-sigmoid
-  ([x]
+(defn ^Number standard-sigmoid
+  ([^Number x]
    {:pre [(number? x)]
     :post [(number? %)]}
    (/ 1 (+ 1 (Math/exp (- x))))))
 
-(defn g
-  ([x]
+(defn ^Number g
+  ([^Number x]
    (standard-sigmoid x)))
 
-(defn ^Double a-hidden-layer-output
+(defn ^Number a-hidden-layer-output
   "Return output of hidden-layer_i with xs. As_i is d-dimension. B_i is number.
    Xs is d-dimension."
-  ([^clojure.lang.PersistentVector as_i ^Double b_i ^clojure.lang.PersistentVector xs]
+  ([^clojure.lang.PersistentVector as_i ^Number b_i ^clojure.lang.PersistentVector xs]
    {:pre [(coll? as_i) (number? b_i) (coll? xs)]}
    (g (+ (c/inner-product as_i xs)
          b_i))))
 
-(defn hidden-layer-output-matrix
+(defn ^clojure.lang.PersistentVector hidden-layer-output-matrix
   "Ass is d-L-dimension. Xss is d-L-dimesion. Bs is L-dimension."
-  ([ass bs xss]
+  ([^clojure.lang.PersistentVector ass ^Number bs ^clojure.lang.PersistentVector xss]
    {:pre [(coll? ass) (coll? (first ass))
           (coll? bs) (number? (first bs))
           (coll? xss) (coll? (first xss))]
     :post [(= (count (first %)) (count ass)) (= (count %) (count xss))]}
    (pmap (fn [xs_i] (pmap #(a-hidden-layer-output %1 %2 xs_i) ass bs)) xss)))
 
-(defn pseudo-inverse-matrix
-  ([mat]
+(defn ^clojure.lang.PersistentVector pseudo-inverse-matrix
+  ([^clojure.lang.PersistentVector mat]
    {:pre [(coll? mat) (coll? (first mat))]}
    (let [matrix (c/matrix mat)
          transmat (c/trans matrix)
@@ -77,8 +77,8 @@
 
 (defrecord Model [ass bs betas])
 
-(defn train-model
-  ([dataset L & {:keys [norm] :or {norm false}}]
+(defn ^Model train-model
+  ([^DataSet dataset ^Integer L & {:keys [^Boolean norm] :or {norm false}}]
    {:pre [(instance? DataSet dataset) (integer? L)]}
    (let [normf (if norm data/normalize identity)
          d (data/num-of-feature dataset)
@@ -90,18 +90,19 @@
          betas (c/to-vect (c/mmult (pseudo-inverse-matrix H) T))]
      (Model. ass bs betas))))
 
-(defn predict
-  ([ass bs betas xs]
+(defn ^Integer predict
+  ([^clojure.lang.PersistentVector ass ^clojure.lang.PersistentVector bs
+    ^clojure.lang.PersistentVector betas ^clojure.lang.PersistentVector xs]
    {:pre [(coll? ass) (coll? (first ass)) (coll? bs) (coll? betas) (coll? xs)]}
    (-> (map #(* %1 (a-hidden-layer-output %2 %3 xs)) betas ass bs)
        (c/sum)
        (sign)))
-  ([^Model model xs]
+  ([^Model model ^clojure.lang.PersistentVector xs]
    {:pre [(instance? Model model) (coll? xs)]}
    (predict (:ass model) (:bs model) (:betas model) xs)))
 
-(defn evaluation
-  ([results facts]
+(defn ^Number evaluation
+  ([^clojure.lang.PersistentVector results ^clojure.lang.PersistentVector facts]
    {:pre [(coll? results) (coll? facts)]}
    (let [numd (count results)]
      (->> (map #(= %1 %2) results facts)
@@ -109,8 +110,8 @@
           (count)
           (#(/ % numd))))))
 
-(defn _cross-validate
-  ([dataset a b L]
+(defn ^Number _cross-validate
+  ([^DataSet dataset ^Integer a ^Integer b ^Integer L]
    {:pre [(instance? DataSet dataset) (integer? a) (integer? b) (> b a)]}
    (let [test (DataSet. (data/extract-list (:classes dataset) a b)
                         (data/extract-list (:features dataset) a b))
@@ -123,9 +124,9 @@
          (as-> eva (do (println eva)
                        eva))))))
 
-(defn cross-validate
-  ([dataset k L]
-   {:pre [(instance? DataSet dataset) (integer? k)]}
+(defn ^Number cross-validate
+  ([^DataSet dataset ^Integer k ^Integer L]
+   {:pre [(instance? DataSet dataset) (integer? k) (integer? L)]}
    (let [norm-dataset (DataSet. (:classes dataset) (data/normalize (:features dataset)))
          numd (count (:classes norm-dataset)) ; number of data
          groupn (quot numd k)]                ; number of one group's element
