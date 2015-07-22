@@ -34,9 +34,16 @@
         (map parse-lib-svm-data)
         (#(DataSet. (map first %) (map second %))))))
 
-(defn concat-detaset [dsa dsb]
+(defn concat-dataset [dsa dsb]
   {:pre [(instance? DataSet dsa) (instance? DataSet dsb)]}
   (DataSet. (concat (:classes dsa) (:classes dsb)) (concat (:features dsa) (:features dsb))))
+
+(defn shuffle-dataset
+  ([dataset]
+   {:pre [(instance? DataSet dataset)]}
+   (-> (map vector (:classes dataset) (:features dataset))
+       (shuffle)
+       (#(DataSet. (map first %) (map second %))))))
 
 (defn num-of-feature 
   ([dataset]

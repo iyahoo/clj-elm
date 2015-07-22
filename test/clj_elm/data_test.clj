@@ -48,9 +48,21 @@
     => [1.0 22.08 11.46 2.0 4.0]))
 
 (facts "test-concat-dataset"
-  (facts "(concat-detaset dsa dsb)"
-    (concat-detaset (DataSet. [1 1] [3 3]) (DataSet. [-1 -1] [0 0]))
+  (facts "(concat-dataset dsa dsb)"
+    (concat-dataset (DataSet. [1 1] [3 3]) (DataSet. [-1 -1] [0 0]))
     => #clj_elm.data.DataSet{:classes [1 1 -1 -1], :features [3 3 0 0]}))
+
+(facts "test-shuffle-dataset"
+  (facts "(shuffle-dataset dataset)"
+    (-> (shuffle-dataset (DataSet. [1 2 3 4 5] [1 2 3 4 5]))
+        (#(= (:classes %) (:features %))))
+    => true
+    (-> (shuffle-dataset (DataSet. [1 2 3 4 5] [1 2 3 4 5]))
+        (#(= (:classes %) (:features %))))
+    => true
+    (-> (shuffle-dataset (DataSet. [1 2 3 4 5] [1 2 3 4 5]))
+        (#(= (:classes %) (:features %))))
+    => true))
 
 (facts "test-get-features"
   (facts "(get-features line)"
