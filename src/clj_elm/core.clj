@@ -1,14 +1,11 @@
 (ns clj-elm.core
   (:require [clojure.repl :refer [doc]]
             [clj-elm.data :as data]
-            ;; [clojure.core.typed :as t :only [atom doseq let fn defn ref dotimes defprotocol loop for]]
-            ;; [clojure.core.typed :refer :all :exclude [atom doseq let fn defn ref dotimes defprotocol loop for]]
             [incanter.core :as c :exclude [update]])
   (:import [clj_elm.data DataSet]))
 
-;; (ann sign [Num -> Int])
 (defn sign
-  "The signum function of a real number x."
+  "The signum function for a real number x."
   ([x]
    {:pre [(number? x)]}
    (cond
@@ -16,24 +13,18 @@
      (= x 0) 0
      :else -1)))
 
-;; (ann ^:no-check clojure.core/float? [Any -> Bool])
-
-;; (ann make-weights [Int -> (Seqable Number)])
 (defn make-weights
   "Make a d-dimension-random-feature vector. d is number of dimention of
    feature. All elements are in [-1,1]"
   ([d]
-   {:pre [(integer? d)]
-    :post [(= (count %) d)]}
+   {:pre [(integer? d)]}
    (take d (repeatedly #(dec (rand 2))))))
 
-;; (ann make-as [Int Int -> (Seqable Number)])
 (defn make-ass
   ([d L]
    {:pre [(integer? d) (integer? L)]}
    (take L (repeatedly #(make-weights d)))))
 
-;; (ann make-b [Int -> (Seqable Number)])
 (defn make-bs
   ([L]
    {:pre (integer? L)}
@@ -86,15 +77,18 @@
 
 (defrecord Model [ass bs betas])
 
-(defn train-model [dataset L]
-  (let [d (data/num-of-feature dataset)
-        ass (make-ass d L)
-        bs (make-bs L)
-        xss (data/normalize (:features dataset))
-        H (hidden-layer-output-matrix ass bs xss)
-        T (:classes dataset)
-        betas (c/to-vect (c/mmult (pseudo-inverse-matrix H) T))]
-    (Model. ass bs betas)))
+(defn train-model
+  ([dataset L & {:keys [norm] :or {norm false}}]
+   {:pre [(instance? DataSet dataset) (integer? L)]}
+   (let [normf (if norm data/normalize identity)
+         d (data/num-of-feature dataset)
+         ass (make-ass d L)
+         bs (make-bs L)
+         xss (normf (:features dataset))
+         H (hidden-layer-output-matrix ass bs xss)
+         T (:classes dataset)
+         betas (c/to-vect (c/mmult (pseudo-inverse-matrix H) T))]
+     (Model. ass bs betas))))
 
 (defn predict
   ([ass bs betas xs]
@@ -122,10 +116,12 @@
                         (data/extract-list (:features dataset) a b))
          sample (DataSet. (data/remove-list (:classes dataset) a b)
                           (data/remove-list (:features dataset) a b))]
-     (dorun (println "Data" a "to" b "."))
+     (dorun (println (str "Data " a " to " b ".")))
      (-> (train-model sample L)
          (#(map (fn [feature] (predict % feature)) (:features test)))
-         (evaluation (:classes test))))))
+         (evaluation (:classes test))
+         (as-> eva (do (println eva)
+                       eva))))))
 
 (defn cross-validate
   ([dataset k L]
@@ -134,6 +130,7 @@
          numd (count (:classes norm-dataset)) ; number of data
          groupn (quot numd k)]                ; number of one group's element
      (->> (take k (iterate #(+ % groupn) 0))
-          (map #(_cross-validate norm-dataset % (+ % (dec groupn)) L))
-          (reduce +)
+          (pmap #(_cross-validate norm-dataset % (+ % (dec groupn)) L))
+          (reduce +)          
           (* (/ 1 k))))))
+

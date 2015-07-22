@@ -6,8 +6,6 @@
             [incanter.io :as io]
             [svm.core :as svm]))
 
-(io/read-dataset "data/australian.csv" :delim \, :header true)
-
 (defrecord DataSet [classes features])
 
 (defn parse-lib-svm-data [line]
@@ -24,9 +22,9 @@
    (DataSet. (map int (c/to-vect (c/$ :all cidx dataset))) (c/to-vect (c/$ [:not cidx] dataset)))))
 
 (defn read-dataset
-  ([path cidx]
+  ([path cidx header]
    {:pre [(string? path) (integer? cidx)]}   
-   (-> (io/read-dataset path :delim \, :header true)
+   (-> (io/read-dataset path :delim \, :header header)
        (data-set cidx))))
 
 (defn read-dataset-lib-svm
@@ -35,6 +33,10 @@
    (->> (svm/read-dataset path)
         (map parse-lib-svm-data)
         (#(DataSet. (map first %) (map second %))))))
+
+(defn concat-detaset [dsa dsb]
+  {:pre [(instance? DataSet dsa) (instance? DataSet dsb)]}
+  (DataSet. (concat (:classes dsa) (:classes dsb)) (concat (:features dsa) (:features dsb))))
 
 (defn num-of-feature 
   ([dataset]
@@ -48,22 +50,23 @@
 
 (defn ith-feature-list 
   ([dataset i]
-   {:pre [(coll? dataset)]}
+   {:pre [(coll? dataset) (integer? i)]}
    (c/$ i (c/to-dataset dataset))))
 
 (defn each-ith-f 
   ([f dataset]
-   {:pre [(coll? dataset)]}
    (->> (range 0 (count (first dataset)))
         (map #(f (ith-feature-list dataset %)))
         (vec))))
 
 (defn each-ith-mean 
   ([dataset]
+   {:pre [(coll? dataset)]}
    (each-ith-f st/mean dataset)))
 
 (defn each-ith-sd 
   ([dataset]
+   {:pre [(coll? dataset)]}
    (each-ith-f st/sd dataset)))
 
 (defn normalize 
@@ -77,10 +80,10 @@
 
 (defn remove-list
   ([lst a b]
-   {:pre [(coll? lst) (integer? a) (integer? b)]}
+   {:pre [(coll? lst) (integer? a) (integer? b) (> b a)]}
    (concat (take a lst) (drop (inc b) lst))))
 
 (defn extract-list
   ([lst a b]
-   {:pre [(coll? lst) (integer? a) (integer? b)]}
+   {:pre [(coll? lst) (integer? a) (integer? b) (> b a)]}
    (take (inc (- b a)) (drop a lst))))

@@ -1,7 +1,5 @@
 (ns clj-elm.data-test
   (:require [clj-elm.data :refer :all]
-            ;; [clojure.core.typed :as t :only [atom doseq let fn defn ref dotimes defprotocol loop for]]
-            ;; [clojure.core.typed :refer :all :exclude [atom doseq let fn defn ref dotimes defprotocol loop for]]
             [midje.sweet :refer :all]
             [midje.repl :refer (autotest load-facts)]
             [incanter.core :as c :exclude [update]]
@@ -14,7 +12,7 @@
   (io/read-dataset "data/australian.csv" :delim \, :header true))
 
 (def australian-data
-  (read-dataset "data/australian.csv" 14))
+  (read-dataset "data/australian.csv" 14 true))
 
 (def libsvmlian
   (read-dataset-lib-svm "data/australian"))
@@ -48,6 +46,11 @@
     => [1 22.08 11.46 2 4]
     (take 5 (first (:features libsvmlian)))
     => [1.0 22.08 11.46 2.0 4.0]))
+
+(facts "test-concat-dataset"
+  (facts "(concat-detaset dsa dsb)"
+    (concat-detaset (DataSet. [1 1] [3 3]) (DataSet. [-1 -1] [0 0]))
+    => #clj_elm.data.DataSet{:classes [1 1 -1 -1], :features [3 3 0 0]}))
 
 (facts "test-get-features"
   (facts "(get-features line)"
