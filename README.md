@@ -4,13 +4,13 @@ This is Extreme Learning Machine on Clojure. For only 2 class classification.
 
 ## Usage
 
-`(def dataset (data/read-dataset "data/australian.csv" 14 :header true))`
+`(def dataset (data/read-dataset "data/australian.csv" 14 :header true))`  
 `;=> #'clj-elm.core/dataset`
 
-`(def model (train-model dataset 20 :norm true))`
+`(def model (train-model dataset 20 :norm true))`  
 `;=> #'clj-elm.core/model`
 
-`(predict model (first (data/normalize (:features dataset))))`
+`(predict model (first (data/normalize (:features dataset))))`  
 `;=> -1`
 Cross validate test:
 
