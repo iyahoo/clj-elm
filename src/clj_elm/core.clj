@@ -1,5 +1,6 @@
 (ns clj-elm.core
   (:require [clojure.repl :refer [doc]]
+            [clj-elm.data :refer [read-dataset normalize]]
             [clj-elm.data :as data]
             [incanter.core :as c :exclude [update]])
   (:import [clj_elm.data DataSet]))
@@ -35,6 +36,12 @@
    {:pre [(number? x)]
     :post [(number? %)]}
    (/ 1 (+ 1 (Math/exp (- x))))))
+
+(defn bipolar-sigmoid
+  ([x]
+   {:pre [(number? x)]
+    :post [(number? %)]}
+   (dec (/ 2 (+ 1 (Math/exp (- x)))))))
 
 (defn ^Number g
   ([^Number x]
