@@ -11,7 +11,8 @@ This is Extreme Learning Machine on Clojure. For only 2 class classification.
 `;=> #'clj-elm.core/model`
 
 `(predict model (first (data/normalize (:features dataset))))`  
-`;=> -1`
+`;=> -1`  
+  
 Cross validate test:
 
 `(cross-validate dataset 10 100)`
