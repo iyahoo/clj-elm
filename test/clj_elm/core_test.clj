@@ -8,7 +8,7 @@
             [svm.core :as svm]))
 
 (def australian
-  (data/read-dataset "data/australian.csv" 14 true))
+  (data/read-dataset "data/australian.csv" 14 :header true))
 
 (def libsvmlian
   (data/read-dataset-lib-svm "data/australian"))

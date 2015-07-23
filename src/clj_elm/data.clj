@@ -23,7 +23,7 @@
    (DataSet. (pmap int (c/to-vect (c/$ :all cidx dataset))) (c/to-vect (c/$ [:not cidx] dataset)))))
 
 (defn ^DataSet read-dataset
-  ([^String path ^Integer cidx ^Boolean header]
+  ([^String path ^Integer cidx & {:keys [^Boolean header] :or {header false}}]
    {:pre [(string? path) (integer? cidx)]}   
    (-> (io/read-dataset path :delim \, :header header)
        (data-set cidx))))

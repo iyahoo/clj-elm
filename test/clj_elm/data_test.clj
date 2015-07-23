@@ -12,7 +12,7 @@
   (io/read-dataset "data/australian.csv" :delim \, :header true))
 
 (def australian-data
-  (read-dataset "data/australian.csv" 14 true))
+  (read-dataset "data/australian.csv" 14 :header true))
 
 (def libsvmlian
   (read-dataset-lib-svm "data/australian"))
