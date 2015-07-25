@@ -1,7 +1,7 @@
 (ns clj-elm.data
   (:require [clojure.repl :refer [doc]]
             [incanter.datasets :as da]
-            [incanter.core :as c]
+            [incanter.core :as c :exclude [update]]
             [incanter.stats :as st]
             [incanter.io :as io]
             [svm.core :as svm]))
