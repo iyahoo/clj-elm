@@ -33,7 +33,9 @@ This can use dataset CSV or lib-svm form.
 
 Cross validate test:  
 
-`(cross-validate dataset 10 100)`
+```clojure
+(cross-validate dataset 100 10)
+```
 
 ## License
 
