@@ -132,7 +132,7 @@
                        eva))))))
 
 (defn ^Number cross-validate
-  ([^DataSet dataset ^Integer k ^Integer L]
+  ([^DataSet dataset ^Integer L ^Integer k]
    {:pre [(instance? DataSet dataset) (integer? k) (integer? L)]}
    (let [norm-dataset (DataSet. (:classes dataset) (data/normalize (:features dataset)))
          numd (count (:classes norm-dataset)) ; number of data
