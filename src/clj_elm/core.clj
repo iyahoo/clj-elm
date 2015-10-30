@@ -116,6 +116,11 @@
           (count)
           (#(/ % numd))))))
 
+(defn select-count
+  ([cond coll]
+   {:pre [(coll? coll)]}
+   (count (filter cond coll))))
+
 (defn _cross-validate
   ([dataset a b L]
    {:pre [(instance? DataSet dataset) (integer? a) (integer? b) (> b a)]}
