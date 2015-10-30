@@ -102,14 +102,27 @@
       (predict model (first (normalize (:features libsvmlian))))
       => -1)))
 
+(facts "test-update-exp-data"
+  (fact "(update-exp-data pred fact exp)"
+    (let [exp {:TP 0 :FP 0 :TN 10 :FN 10}]
+      (:TP (update-exp-data 1 1 exp))
+      => 1
+      (:FP (update-exp-data 1 -1 exp))
+      => 1
+      (:TN (update-exp-data -1 -1 exp))
+      => 11
+      (:FN (update-exp-data -1 1 exp))
+      => 11)))
+
 (facts "test-evaluation"
-  (facts "(evaluation results facts)"
-    (evaluation [1 1 1 1 1 1 1 1 1 1] [1 1 1 1 1 1 1 1 1 1])
-    => 1
-    (evaluation [-1 -1 -1 -1 -1 1 1 1 1 1] [1 1 1 1 1 1 1 1 1 1])
-    => 1/2
-    (evaluation [-1 -1 -1 -1 -1 -1 -1 -1 -1 1] [1 1 1 1 1 1 1 1 1 1])
-    => 1/10))
+  (let [dummy {}]
+    (facts "(evaluation results facts)"
+     (evaluation [1 1 1 1 1 1 1 1 1 1] dummy [1 1 1 1 1 1 1 1 1 1])
+     => 1
+     (evaluation [-1 -1 -1 -1 -1 1 1 1 1 1] dummy [1 1 1 1 1 1 1 1 1 1])
+     => 1/2
+     (evaluation [-1 -1 -1 -1 -1 -1 -1 -1 -1 1] dummy[1 1 1 1 1 1 1 1 1 1])
+     => 1/10)))
 
 (facts "test-select-count"
   (fact "(select-count cond dataset)"
