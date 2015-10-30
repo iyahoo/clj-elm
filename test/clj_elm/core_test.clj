@@ -5,7 +5,8 @@
             [midje.repl :refer (autotest load-facts)]
             [incanter.core :as c :exclude [update]]
             [incanter.io :as io]
-            [svm.core :as svm]))
+            [svm.core :as svm])
+  (:import [clj_elm.data DataSet]))
 
 (def australian
   (data/read-dataset "data/australian.csv" 14 :header true))
@@ -109,3 +110,10 @@
     => 1/2
     (evaluation [-1 -1 -1 -1 -1 -1 -1 -1 -1 1] [1 1 1 1 1 1 1 1 1 1])
     => 1/10))
+
+(facts "test-select-count"
+  (fact "(select-count cond dataset)"
+    (select-count odd? [1 2 3 4 5])
+    => 3
+    (select-count #(= % 1) (:classes (DataSet. [1 1 -1 -1] [[1 1] [1 1] [1 1] [1 1]])))
+    => 2))
