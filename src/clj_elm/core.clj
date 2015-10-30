@@ -146,7 +146,7 @@
          groupn (quot numd k)]                ; number of one group's element
      (->> (take k (iterate #(+ % groupn) 0))
           (pmap #(let [[eva exp-data] (_cross-validate norm-dataset % (+ % (dec groupn)) L)]
-                   (println exp-data)
+                   (dorun (println exp-data))
                    eva))
           (reduce +)          
           (* (/ 1 k))))))
