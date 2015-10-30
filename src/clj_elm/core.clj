@@ -97,7 +97,7 @@
          betas (c/to-vect (c/mmult (pseudo-inverse-matrix H) T))]
      (Model. ass bs betas))))
 
-(defn predict  
+(defn predict
   ([model xs]
    {:pre [(instance? Model model) (coll? xs)]}
    (predict (:ass model) (:bs model) (:betas model) xs))
@@ -115,14 +115,24 @@
     (and (= pred -1) (= fact -1)) (assoc exp :TN (inc (:TN exp)))
     (and (= pred -1) (= fact 1)) (assoc exp :FN (inc (:FN exp)))))
 
+(defn confusion-matrix [preds facts exp]
+  {:pre [(coll? preds) (coll? facts) (map? exp)]}
+  (if (or (empty? preds) (empty? facts))
+    (let [TP (:TP exp) FP (:FP exp)
+          TN (:TN exp) FN (:FN exp)]
+      (-> exp
+          (assoc :Accuracy (/ (+ TP TN) (+ TP FP TN FN)))
+          (assoc :Recall (/ TP (+ TP FN)))
+          (assoc :Precision (/ TP (+ TP FP)))))
+    (let [pred (first preds)
+          fact (first facts)]
+      (recur (rest preds) (rest facts) (update-exp-data pred fact exp)))))
+
 (defn evaluation
-  ([results expdata facts]
+  ([results facts expdata]
    {:pre [(coll? results) (coll? facts) (map? expdata)]}
    (let [numd (count results)]
-     (->> (pmap #(= %1 %2) results facts)
-          (filter true?)
-          (count)
-          (#(/ % numd))))))
+     (confusion-matrix results facts expdata))))
 
 (defn select-count
   ([cond coll]
@@ -144,8 +154,7 @@
                    :Accuracy 0.0 :Recall 0.0 :Precision 0.0 :TP 0 :FP 0 :TN 0 :FN 0 }]
      (-> (train-model sample L)
          (#(pmap (fn [feature] (predict % feature)) (:features test)))
-         (evaluation (:classes test))
-         (as-> eva (do [eva exp-data]))))))
+         (#(evaluation (:classes test) % exp-data))))))
 
 (defn cross-validate
   ([dataset L k]
@@ -154,8 +163,8 @@
          numd (count (:classes norm-dataset)) ; number of data
          groupn (quot numd k)]                ; number of one group's element
      (->> (take k (iterate #(+ % groupn) 0))
-          (pmap #(let [[eva exp-data] (_cross-validate norm-dataset % (+ % (dec groupn)) L)]
-                   (dorun (println exp-data))
-                   eva))
-          (reduce +)          
+          (pmap #(let [eva (_cross-validate norm-dataset % (+ % (dec groupn)) L)]
+                   (dorun (println eva))
+                   (:Accuracy eva)))
+          (reduce +)
           (* (/ 1 k))))))
