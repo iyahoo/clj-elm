@@ -156,6 +156,17 @@
          (#(pmap (fn [feature] (predict % feature)) (:features test)))
          (#(evaluation (:classes test) % exp-data))))))
 
+(defn print-exp-data [expdata]
+  (print "L: " (:L expdata) "\n"
+         "length(train_cover): " (:length-train-cover expdata) "\n"
+         "length(test_cover): " (:length-test-cover expdata) "\n"
+         "length(train_stego): " (:length-train-stego expdata) "\n"
+         "length(test_stego): " (:length-train-cover expdata) "\n"
+         "TP: " (:TP expdata) ", FP: " (:FP expdata) ", TN: " (:TN expdata) ", FN: " (:FN expdata) "\n"
+         "Accracy: " (:Accuracy expdata "\n")
+         "Recall: " (:Recall expdata "\n")
+         "Precision: " (:Precision expdata) "\n\n"))
+
 (defn cross-validate
   ([dataset L k]
    {:pre [(instance? DataSet dataset) (integer? k) (integer? L)]}
@@ -164,7 +175,7 @@
          groupn (quot numd k)]                ; number of one group's element
      (->> (take k (iterate #(+ % groupn) 0))
           (pmap #(let [eva (_cross-validate norm-dataset % (+ % (dec groupn)) L)]
-                   (dorun (println eva))
+                   (dorun (print-exp-data eva))
                    (:Accuracy eva)))
           (reduce +)
           (* (/ 1 k))))))
