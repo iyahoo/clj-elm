@@ -37,6 +37,8 @@ Cross validate test:
 (cross-validate dataset 100 10)
 ```
 
+This will print out L, length each data, TP, FP, TN, FN, Accuracy, Recall and Precision.
+
 ## License
 
 Copyright © 2015 iyhoo.
