@@ -114,15 +114,20 @@
       (:FN (update-exp-data -1 1 exp))
       => 11)))
 
+(facts "test-confusion-matrix"
+  (fact "(confusion-matrix preds facts exp)"
+    (confusion-matrix [1 1 -1 -1] [1 1 -1 -1] {:TP 0 :FP 0 :TN 0 :FN 0})
+    => {:TP 2, :FP 0, :TN 2, :FN 0, :Accuracy 1, :Recall 1, :Precision 1}))
+
 (facts "test-evaluation"
-  (let [dummy {}]
+  (let [dummy {:TP 0 :FP 0 :TN 0 :FN 0}]
     (facts "(evaluation results facts)"
-     (evaluation [1 1 1 1 1 1 1 1 1 1] dummy [1 1 1 1 1 1 1 1 1 1])
-     => 1
-     (evaluation [-1 -1 -1 -1 -1 1 1 1 1 1] dummy [1 1 1 1 1 1 1 1 1 1])
-     => 1/2
-     (evaluation [-1 -1 -1 -1 -1 -1 -1 -1 -1 1] dummy[1 1 1 1 1 1 1 1 1 1])
-     => 1/10)))
+      (:Accuracy (evaluation [1 1 1 1 1 1 1 1 1 1] [1 1 1 1 1 1 1 1 1 1] dummy))
+      => 1
+      (:Accuracy (evaluation [-1 -1 -1 -1 -1 1 1 1 1 1] [1 1 1 1 1 1 1 1 1 1] dummy))
+      => 1/2
+      (:Accuracy (evaluation [-1 -1 -1 -1 -1 -1 -1 -1 -1 1] [1 1 1 1 1 1 1 1 1 1] dummy))
+      => 1/10)))
 
 (facts "test-select-count"
   (fact "(select-count cond dataset)"
