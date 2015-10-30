@@ -107,9 +107,17 @@
        (c/sum)
        (sign))))
 
+(defn update-exp-data [pred fact exp]
+  {:pre [(= (Math/abs pred) (Math/abs fact) 1)]}
+  (cond
+    (and (= pred 1) (= fact 1)) (assoc exp :TP (inc (:TP exp)))
+    (and (= pred 1) (= fact -1)) (assoc exp :FP (inc (:FP exp)))
+    (and (= pred -1) (= fact -1)) (assoc exp :TN (inc (:TN exp)))
+    (and (= pred -1) (= fact 1)) (assoc exp :FN (inc (:FN exp)))))
+
 (defn evaluation
-  ([results facts]
-   {:pre [(coll? results) (coll? facts)]}
+  ([results expdata facts]
+   {:pre [(coll? results) (coll? facts) (map? expdata)]}
    (let [numd (count results)]
      (->> (pmap #(= %1 %2) results facts)
           (filter true?)
