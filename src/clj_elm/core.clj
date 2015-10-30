@@ -127,13 +127,16 @@
    (let [test (DataSet. (data/extract-list (:classes dataset) a b)
                         (data/extract-list (:features dataset) a b))
          sample (DataSet. (data/remove-list (:classes dataset) a b)
-                          (data/remove-list (:features dataset) a b))]
-     (dorun (println (str "Data " a " to " b ".")))
+                          (data/remove-list (:features dataset) a b))
+         exp-data {:num (str "Data " a " to " b)
+                   :length-train-cover (select-count #(= % -1) (:classes sample))
+                   :length-test-cover (select-count #(= % -1) (:classes test))
+                   :length-train-stego (select-count #(= % 1) (:classes sample))
+                   :length-test-stego (select-count #(= % 1) (:classes test))}]
      (-> (train-model sample L)
          (#(pmap (fn [feature] (predict % feature)) (:features test)))
          (evaluation (:classes test))
-         (as-> eva (do (println eva)
-                       eva))))))
+         (as-> eva (do [eva exp-data]))))))
 
 (defn cross-validate
   ([dataset L k]
@@ -142,6 +145,8 @@
          numd (count (:classes norm-dataset)) ; number of data
          groupn (quot numd k)]                ; number of one group's element
      (->> (take k (iterate #(+ % groupn) 0))
-          (pmap #(_cross-validate norm-dataset % (+ % (dec groupn)) L))
+          (pmap #(let [[eva exp-data] (_cross-validate norm-dataset % (+ % (dec groupn)) L)]
+                   (println exp-data)
+                   eva))
           (reduce +)          
           (* (/ 1 k))))))
