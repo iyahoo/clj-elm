@@ -151,7 +151,7 @@
                    :length-test-cover (select-count #(= % -1) (:classes test))
                    :length-train-stego (select-count #(= % 1) (:classes sample))
                    :length-test-stego (select-count #(= % 1) (:classes test))
-                   :Accuracy 0.0 :Recall 0.0 :Precision 0.0 :TP 0 :FP 0 :TN 0 :FN 0 }]
+                   :Accuracy 0.0 :Recall 0.0 :Precision 0.0 :TP 0 :FP 0 :TN 0 :FN 0 :L L}]
      (-> (train-model sample L)
          (#(pmap (fn [feature] (predict % feature)) (:features test)))
          (#(evaluation (:classes test) % exp-data))))))
