@@ -104,30 +104,33 @@
 
 (facts "test-update-exp-data"
   (fact "(update-exp-data pred fact exp)"
-    (let [exp {:TP 0 :FP 0 :TN 10 :FN 10}]
-      (:TP (update-exp-data 1 1 exp))
+    (let [exp (atom {:TP 0 :FP 0 :TN 10 :FN 10})]
+      (:TP @(update-exp-data 1 1 exp))
       => 1
-      (:FP (update-exp-data 1 -1 exp))
+      (:FP @(update-exp-data 1 -1 exp))
       => 1
-      (:TN (update-exp-data -1 -1 exp))
+      (:TN @(update-exp-data -1 -1 exp))
       => 11
-      (:FN (update-exp-data -1 1 exp))
+      (:FN @(update-exp-data -1 1 exp))
       => 11)))
 
 (facts "test-confusion-matrix"
   (fact "(confusion-matrix preds facts exp)"
-    (confusion-matrix [1 1 -1 -1] [1 1 -1 -1] {:TP 0 :FP 0 :TN 0 :FN 0})
+    (let [exp (atom {:TP 0 :FP 0 :TN 0 :FN 0})]
+      (confusion-matrix [1 1 -1 -1] [1 1 -1 -1] exp))
     => {:TP 2, :FP 0, :TN 2, :FN 0, :Accuracy 1, :Recall 1, :Precision 1}))
 
 (facts "test-evaluation"
-  (let [dummy {:TP 0 :FP 0 :TN 0 :FN 0}]
-    (facts "(evaluation results facts)"
-      (:Accuracy (evaluation [1 1 1 1 1 1 1 1 1 1] [1 1 1 1 1 1 1 1 1 1] dummy))
-      => 1
-      (:Accuracy (evaluation [-1 -1 -1 -1 -1 1 1 1 1 1] [1 1 1 1 1 1 1 1 1 1] dummy))
-      => 1/2
-      (:Accuracy (evaluation [-1 -1 -1 -1 -1 -1 -1 -1 -1 1] [1 1 1 1 1 1 1 1 1 1] dummy))
-      => 1/10)))
+  (facts "(evaluation results facts)"
+    (let [dummy (atom {:TP 0 :FP 0 :TN 0 :FN 0})]
+      (:Accuracy (evaluation [1 1 1 1 1 1 1 1 1 1] [1 1 1 1 1 1 1 1 1 1] dummy)))
+    => 1
+    (let [dummy (atom {:TP 0 :FP 0 :TN 0 :FN 0})]
+      (:Accuracy (evaluation [-1 -1 -1 -1 -1 1 1 1 1 1] [1 1 1 1 1 1 1 1 1 1] dummy)))
+    => 1/2
+    (let [dummy (atom {:TP 0 :FP 0 :TN 0 :FN 0})]
+      (:Accuracy (evaluation [-1 -1 -1 -1 -1 -1 -1 -1 -1 1] [1 1 1 1 1 1 1 1 1 1] dummy)))
+    => 1/10))
 
 (facts "test-select-count"
   (fact "(select-count cond dataset)"
