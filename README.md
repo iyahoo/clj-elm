@@ -4,9 +4,11 @@ This is Extreme Learning Machine on Clojure. For only 2 class classification.
 
 ## Usage
 
-`$ git clone https://github.com/iyahoo/clj-elm.git`
-`$ cd clj-elm`
-`$ lein repl`
+```shell
+$ git clone https://github.com/iyahoo/clj-elm.git
+$ cd clj-elm
+$ lein repl
+```
 
 ```clojure
 (load-file "src/clj_elm/core.clj")
