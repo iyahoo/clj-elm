@@ -108,13 +108,14 @@
        (sign))))
 
 (defn update-exp [fn key exp]
+  {:pre [(fn? fn) (keyword? key) (map? @exp)]}
   (reset! exp (assoc @exp key (fn (key @exp))))
   exp)
 
 (defn count-rate [pred fact exp]
   {:pre [(= (Math/abs pred) (Math/abs fact) 1) (map? @exp)]}
   (cond
-    (and (= pred 1) (= fact 1)) (update-exp :TP inc exp)
+    (and (= pred 1) (= fact 1)) (update-exp inc :TP exp)
     (and (= pred 1) (= fact -1)) (update-exp inc :FP exp)
     (and (= pred -1) (= fact -1)) (update-exp inc :TN exp)
     (and (= pred -1) (= fact 1)) (update-exp inc :FN exp)))
