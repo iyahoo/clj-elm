@@ -149,18 +149,18 @@
 
 (defn _cross-validate
   ([dataset a b L]
-   {:pre [(instance? DataSet dataset) (integer? a) (integer? b) (> b a)]}
-   (let [test (DataSet. (data/extract-list (:classes dataset) a b)
-                        (data/extract-list (:features dataset) a b))
-         sample (DataSet. (data/remove-list (:classes dataset) a b)
-                          (data/remove-list (:features dataset) a b))
+   {:pre [(instance? DataSet @dataset) (integer? a) (integer? b) (> b a)]}
+   (let [test (DataSet. (data/extract-list (:classes @dataset) a b)
+                        (data/extract-list (:features @dataset) a b))
+         train (DataSet. (data/remove-list (:classes @dataset) a b)
+                         (data/remove-list (:features @dataset) a b))
          exp (atom {:num (str "Data " a " to " b)
-                    :length-train-cover (select-count #(= % -1) (:classes sample))
+                    :length-train-cover (select-count #(= % -1) (:classes train))
                     :length-test-cover (select-count #(= % -1) (:classes test))
-                    :length-train-stego (select-count #(= % 1) (:classes sample))
+                    :length-train-stego (select-count #(= % 1) (:classes train))
                     :length-test-stego (select-count #(= % 1) (:classes test))
                     :Accuracy 0.0 :Recall 0.0 :Precision 0.0 :TP 0 :FP 0 :TN 0 :FN 0 :L L})]
-     (-> (train-model sample L)
+     (-> (train-model train L)
          (#(pmap (fn [feature] (predict % feature)) (:features test)))
          (#(evaluation (:classes test) % exp))))))
 
@@ -178,8 +178,8 @@
 (defn cross-validate
   ([dataset L k]
    {:pre [(instance? DataSet dataset) (integer? k) (integer? L)]}
-   (let [norm-dataset (DataSet. (:classes dataset) (data/normalize (:features dataset)))
-         numd (count (:classes norm-dataset)) ; number of data
+   (let [norm-dataset (atom (DataSet. (:classes dataset) (data/normalize (:features dataset))))
+         numd (count (:classes @norm-dataset)) ; number of data
          groupn (quot numd k)]                ; number of one group's element
      (->> (take k (iterate #(+ % groupn) 0))
           (pmap #(let [eva (_cross-validate norm-dataset % (+ % (dec groupn)) L)]
