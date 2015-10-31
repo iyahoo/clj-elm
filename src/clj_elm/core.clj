@@ -107,7 +107,7 @@
        (c/sum)
        (sign))))
 
-(defn update-exp-data [pred fact exp]
+(defn count-rate [pred fact exp]
   {:pre [(= (Math/abs pred) (Math/abs fact) 1) (map? @exp)]}
   (cond
     (and (= pred 1) (= fact 1))
@@ -134,7 +134,7 @@
           (#(reset! exp (assoc % :Precision (/ TP (+ TP FP)))))))
     (let [pred (first preds)
           fact (first facts)]
-      (recur (rest preds) (rest facts) (update-exp-data pred fact exp)))))
+      (recur (rest preds) (rest facts) (count-rate pred fact exp)))))
 
 (defn evaluation
   ([results facts exp]

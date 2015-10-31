@@ -102,16 +102,16 @@
       (predict model (first (normalize (:features libsvmlian))))
       => -1)))
 
-(facts "test-update-exp-data"
-  (fact "(update-exp-data pred fact exp)"
+(facts "test-count-rate"
+  (fact "(count-rate pred fact exp)"
     (let [exp (atom {:TP 0 :FP 0 :TN 10 :FN 10})]
-      (:TP @(update-exp-data 1 1 exp))
+      (:TP @(count-rate 1 1 exp))
       => 1
-      (:FP @(update-exp-data 1 -1 exp))
+      (:FP @(count-rate 1 -1 exp))
       => 1
-      (:TN @(update-exp-data -1 -1 exp))
+      (:TN @(count-rate -1 -1 exp))
       => 11
-      (:FN @(update-exp-data -1 1 exp))
+      (:FN @(count-rate -1 1 exp))
       => 11)))
 
 (facts "test-confusion-matrix"
