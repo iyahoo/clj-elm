@@ -115,11 +115,11 @@
 
 (defn count-rate [pred fact exp]
   {:pre [(= (Math/abs pred) (Math/abs fact) 1) (map? @exp)]}
-  (cond
-    (and (= pred 1) (= fact 1)) (update-exp inc :TP exp)
-    (and (= pred 1) (= fact -1)) (update-exp inc :FP exp)
-    (and (= pred -1) (= fact -1)) (update-exp inc :TN exp)
-    (and (= pred -1) (= fact 1)) (update-exp inc :FN exp)))
+  (match [pred fact]
+    [ 1  1] (update-exp inc :TP exp)
+    [ 1 -1] (update-exp inc :FP exp)
+    [-1 -1] (update-exp inc :TN exp)
+    [-1  1] (update-exp inc :FN exp)))
 
 (defn confusion-matrix [preds facts exp]
   {:pre [(coll? preds) (coll? facts) (map? @exp)]}
