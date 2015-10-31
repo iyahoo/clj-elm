@@ -108,31 +108,39 @@
        (sign))))
 
 (defn update-exp-data [pred fact exp]
-  {:pre [(= (Math/abs pred) (Math/abs fact) 1)]}
+  {:pre [(= (Math/abs pred) (Math/abs fact) 1) (map? @exp)]}
   (cond
-    (and (= pred 1) (= fact 1)) (assoc exp :TP (inc (:TP exp)))
-    (and (= pred 1) (= fact -1)) (assoc exp :FP (inc (:FP exp)))
-    (and (= pred -1) (= fact -1)) (assoc exp :TN (inc (:TN exp)))
-    (and (= pred -1) (= fact 1)) (assoc exp :FN (inc (:FN exp)))))
+    (and (= pred 1) (= fact 1))
+    (do (reset! exp (assoc @exp :TP (inc (:TP @exp))))
+        exp)
+    (and (= pred 1) (= fact -1))
+    (do (reset! exp (assoc @exp :FP (inc (:FP @exp))))
+        exp)
+    (and (= pred -1) (= fact -1))
+    (do (reset! exp (assoc @exp :TN (inc (:TN @exp))))
+        exp)
+    (and (= pred -1) (= fact 1))
+    (do (reset! exp (assoc @exp :FN (inc (:FN @exp))))
+        exp)))
 
 (defn confusion-matrix [preds facts exp]
-  {:pre [(coll? preds) (coll? facts) (map? exp)]}
+  {:pre [(coll? preds) (coll? facts) (map? @exp)]}
   (if (or (empty? preds) (empty? facts))
-    (let [TP (:TP exp) FP (:FP exp)
-          TN (:TN exp) FN (:FN exp)]
-      (-> exp
+    (let [TP (:TP @exp) FP (:FP @exp)
+          TN (:TN @exp) FN (:FN @exp)]
+      (-> @exp
           (assoc :Accuracy (/ (+ TP TN) (+ TP FP TN FN)))
           (assoc :Recall (/ TP (+ TP FN)))
-          (assoc :Precision (/ TP (+ TP FP)))))
+          (#(reset! exp (assoc % :Precision (/ TP (+ TP FP)))))))
     (let [pred (first preds)
           fact (first facts)]
       (recur (rest preds) (rest facts) (update-exp-data pred fact exp)))))
 
 (defn evaluation
-  ([results facts expdata]
-   {:pre [(coll? results) (coll? facts) (map? expdata)]}
+  ([results facts exp]
+   {:pre [(coll? results) (coll? facts) (map? @exp)]}
    (let [numd (count results)]
-     (confusion-matrix results facts expdata))))
+     (confusion-matrix results facts exp))))
 
 (defn select-count
   ([cond coll]
@@ -146,15 +154,15 @@
                         (data/extract-list (:features dataset) a b))
          sample (DataSet. (data/remove-list (:classes dataset) a b)
                           (data/remove-list (:features dataset) a b))
-         exp-data {:num (str "Data " a " to " b)
-                   :length-train-cover (select-count #(= % -1) (:classes sample))
-                   :length-test-cover (select-count #(= % -1) (:classes test))
-                   :length-train-stego (select-count #(= % 1) (:classes sample))
-                   :length-test-stego (select-count #(= % 1) (:classes test))
-                   :Accuracy 0.0 :Recall 0.0 :Precision 0.0 :TP 0 :FP 0 :TN 0 :FN 0 :L L}]
+         exp (atom {:num (str "Data " a " to " b)
+                    :length-train-cover (select-count #(= % -1) (:classes sample))
+                    :length-test-cover (select-count #(= % -1) (:classes test))
+                    :length-train-stego (select-count #(= % 1) (:classes sample))
+                    :length-test-stego (select-count #(= % 1) (:classes test))
+                    :Accuracy 0.0 :Recall 0.0 :Precision 0.0 :TP 0 :FP 0 :TN 0 :FN 0 :L L})]
      (-> (train-model sample L)
          (#(pmap (fn [feature] (predict % feature)) (:features test)))
-         (#(evaluation (:classes test) % exp-data))))))
+         (#(evaluation (:classes test) % exp))))))
 
 (defn print-exp-data [expdata]
   (print "L: " (:L expdata) "\n"
