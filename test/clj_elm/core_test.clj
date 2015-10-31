@@ -102,6 +102,12 @@
       (predict model (first (normalize (:features libsvmlian))))
       => -1)))
 
+(facts "test-update-exp"
+  (fact "(update-exp fn key exp) return reference of exp"
+    (let [exp (atom {:TP 0 :FP 0})]
+      @(update-exp inc :TP exp)
+      => {:TP 1 :FP 0})))
+
 (facts "test-count-rate"
   (fact "(count-rate pred fact exp)"
     (let [exp (atom {:TP 0 :FP 0 :TN 10 :FN 10})]
