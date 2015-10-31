@@ -2,7 +2,8 @@
   (:require [clojure.repl :refer [doc]]
             [clj-elm.data :refer [read-dataset normalize]]
             [clj-elm.data :as data]
-            [incanter.core :as c :exclude [update]])
+            [incanter.core :as c :exclude [update]]
+            [clojure.core.match :refer [match]])
   (:import [clj_elm.data DataSet]))
 
 (defn sign
