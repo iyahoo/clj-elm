@@ -1,37 +1,37 @@
 # clj-elm
 
-This is Extreme Learning Machine on Clojure. For only 2 class classification.  
+This is Extreme Learning Machine on Clojure. For only 2 class classification.
 
 ## Usage
 
 `$ git clone https://github.com/iyahoo/clj-elm.git`
-
+`$ cd clj-elm`
 `$ lein repl`
 
 ```clojure
-(use 'clj-elm.core)  
-(use 'clj-elm.data)  
+(load-file "src/clj_elm/core.clj")
+(in-ns 'clj-elm.core)
 
-(def dataset (read-dataset "data/australian.csv" 14 :header true))  
-;=> #'clj-elm.core/dataset  
+(def dataset (read-dataset "data/australian.csv" 14 :header true))
+;=> #'clj-elm.core/dataset
 
-(def model (train-model dataset 20 :norm true))  
-;=> #'clj-elm.core/model  
+(def model (train-model dataset 20 :norm true))
+;=> #'clj-elm.core/model
 
-(predict model (first (normalize (:features dataset))))  
-;=> -1  
+(predict model (first (normalize (:features dataset))))
+;=> -1
 ```
 
-This can use dataset CSV or lib-svm form.  
+You can use dataset CSV or lib-svm form.
 
 ```clojure
-;; csv  
-(read-dataset path-to-csv-dataset class-column :header true-or-false)  
-;; lib-svm  
-(read-dataset path-to-lib-svm-form-dataset)  
+;; csv
+(read-dataset path-to-csv-dataset class-column :header true-or-false)
+;; lib-svm
+(read-dataset path-to-lib-svm-form-dataset)
 ```
 
-Cross validate test:  
+Cross validate test:
 
 ```clojure
 (cross-validate dataset 100 10)
