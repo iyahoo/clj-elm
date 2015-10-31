@@ -107,21 +107,17 @@
        (c/sum)
        (sign))))
 
+(defn update-exp [fn key exp]
+  (reset! exp (assoc @exp key (fn (key @exp))))
+  exp)
+
 (defn count-rate [pred fact exp]
   {:pre [(= (Math/abs pred) (Math/abs fact) 1) (map? @exp)]}
   (cond
-    (and (= pred 1) (= fact 1))
-    (do (reset! exp (assoc @exp :TP (inc (:TP @exp))))
-        exp)
-    (and (= pred 1) (= fact -1))
-    (do (reset! exp (assoc @exp :FP (inc (:FP @exp))))
-        exp)
-    (and (= pred -1) (= fact -1))
-    (do (reset! exp (assoc @exp :TN (inc (:TN @exp))))
-        exp)
-    (and (= pred -1) (= fact 1))
-    (do (reset! exp (assoc @exp :FN (inc (:FN @exp))))
-        exp)))
+    (and (= pred 1) (= fact 1)) (update-exp :TP inc exp)
+    (and (= pred 1) (= fact -1)) (update-exp inc :FP exp)
+    (and (= pred -1) (= fact -1)) (update-exp inc :TN exp)
+    (and (= pred -1) (= fact 1)) (update-exp inc :FN exp)))
 
 (defn confusion-matrix [preds facts exp]
   {:pre [(coll? preds) (coll? facts) (map? @exp)]}
