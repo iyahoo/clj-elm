@@ -10,4 +10,5 @@ pom.xml.asc
 /.nrepl-port
 .hgignore
 .hg/
-
+data/outguess_all_0.0.csv
+data/outguess_all_1.0.csv
