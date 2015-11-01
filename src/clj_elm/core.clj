@@ -9,7 +9,8 @@
 (defn sign
   "The signum function for a real number x."
   ([x]
-   {:pre [(number? x)]}
+   {:pre [(number? x)]
+    :post [(< (Math/abs %) 2)]}
    (cond
      (> x 0) 1
      (= x 0) 0
@@ -87,7 +88,7 @@
 
 (defn train-model
   ([dataset L & {:keys [norm] :or {norm false}}]
-   ;; {:pre [(instance? DataSet dataset) (integer? L)]}
+   {:pre [(instance? DataSet dataset) (integer? L)]}
    (let [normf (if norm data/normalize identity)
          d (data/num-of-feature dataset)
          ass (make-ass d L)
@@ -142,7 +143,7 @@
 
 (defn select-count
   ([cond coll]
-   {:pre [(coll? coll)]}
+   {:pre [(fn? cond) (coll? coll)]}
    (count (filter cond coll))))
 
 (defn _cross-validate
