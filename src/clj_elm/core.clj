@@ -155,10 +155,10 @@
          train (DataSet. (data/remove-list (:classes @dataset) a b)
                          (data/remove-list (:features @dataset) a b))
          exp (atom {:num (str "Data " a " to " b)
-                    :length-train-cover (select-count #(= % -1) (:classes train))
-                    :length-test-cover (select-count #(= % -1) (:classes test))
-                    :length-train-stego (select-count #(= % 1) (:classes train))
-                    :length-test-stego (select-count #(= % 1) (:classes test))
+                    :length-train-negative (select-count #(= % -1) (:classes train))
+                    :length-test-negative (select-count #(= % -1) (:classes test))
+                    :length-train-positive (select-count #(= % 1) (:classes train))
+                    :length-test-positive (select-count #(= % 1) (:classes test))
                     :Accuracy 0.0 :Recall 0.0 :Precision 0.0 :TP 0 :FP 0 :TN 0 :FN 0 :L L})]
      (-> (train-model train L)
          (#(pmap (fn [feature] (predict % feature)) (:features test)))
@@ -166,10 +166,10 @@
 
 (defn print-exp-data [expdata]
   (print "L: " (:L expdata) "\n"
-         "length(train_cover): " (:length-train-cover expdata) "\n"
-         "length(test_cover): " (:length-test-cover expdata) "\n"
-         "length(train_stego): " (:length-train-stego expdata) "\n"
-         "length(test_stego): " (:length-train-cover expdata) "\n"
+         "length(train_negative): " (:length-train-negative expdata) "\n"
+         "length(test_negative): " (:length-test-negative expdata) "\n"
+         "length(train_positive): " (:length-train-positive expdata) "\n"
+         "length(test_positive): " (:length-test-positive expdata) "\n"
          "TP: " (:TP expdata) ", FP: " (:FP expdata) ", TN: " (:TN expdata) ", FN: " (:FN expdata) "\n"
          "Accracy: " (:Accuracy expdata "\n")
          "Recall: " (:Recall expdata "\n")
