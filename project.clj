@@ -14,4 +14,4 @@
                  [svm-clj "0.1.3"]
                  [criterium "0.4.3"]]
   ;; :global-vars {*assert* false}
-  )
+  :main clj-elm.core)
