@@ -191,13 +191,13 @@
 
 (defn -main []
   (printfl "Start exp\n")
-  (def dataset-cover (read-dataset "data/australian.csv" 14 :header true))
+  (def dataset (atom (read-dataset "data/australian.csv" 14 :header true)))
   (printfl "Fin read-data outguess_all_0.0.csv\n")
-  (def dataset-stego (read-dataset "data/australian.csv" 14 :header true))
+  (def datasets (atom (read-dataset "data/australian.csv" 14 :header true)))
   (printfl "Fin read-data outguess_all_1.0.csv\n")
-  (def dataset-row (data/concat-dataset dataset-cover dataset-stego))
+  (reset! dataset (data/concat-dataset @dataset @datasets))
   (printfl "Fin data concat\n")
-  (def dataset (data/shuffle-dataset dataset-row))
+  (reset! dataset (data/shuffle-dataset @dataset))
   (printfl "Fin data shuffle\n")
-  (printfl (str (cross-validate dataset 100 10) "\n"))
+  (printfl (str (cross-validate @dataset 100 10) "\n"))
   (System/exit 0))
