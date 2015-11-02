@@ -183,7 +183,21 @@
          groupn (quot numd k)]                ; number of one group's element
      (->> (take k (iterate #(+ % groupn) 0))
           (pmap #(let [eva (_cross-validate norm-dataset % (+ % (dec groupn)) L)]
-                   (dorun (print-exp-data eva))
+                   (dorun [(print-exp-data eva) (flush)])
                    (:Accuracy eva)))
           (reduce +)
           (* (/ 1 k))))))
+
+
+(defn -main []
+  (printfl "Start exp\n")
+  (def dataset-cover (read-dataset "data/australian.csv" 14 :header true))
+  (printfl "Fin read-data outguess_all_0.0.csv\n")
+  (def dataset-stego (read-dataset "data/australian.csv" 14 :header true))
+  (printfl "Fin read-data outguess_all_1.0.csv\n")
+  (def dataset-row (data/concat-dataset dataset-cover dataset-stego))
+  (printfl "Fin data concat\n")
+  (def dataset (data/shuffle-dataset dataset-row))
+  (printfl "Fin data shuffle\n")
+  (printfl (str (cross-validate dataset 100 10) "\n"))
+  (System/exit 0))
