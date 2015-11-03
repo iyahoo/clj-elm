@@ -1,11 +1,11 @@
 (ns clj-elm.core
-  (:require [clojure.repl :refer [doc]]
-            [clj-elm.data :refer [read-dataset normalize]]
+  (:require [clj-elm.data :refer [read-dataset normalize]]
             [clj-elm.data :as data]
             [clj-elm.util :refer :all]
             [incanter.core :as c :exclude [update]]
             [clojure.core.match :refer [match]])
-  (:import [clj_elm.data DataSet]))
+  (:import [clj_elm.data DataSet])
+  (:gen-class))
 
 (defn sign
   "The signum function for a real number x."
@@ -189,15 +189,17 @@
           (* (/ 1 k))))))
 
 
-(defn -main []
-  (printfl "Start exp\n")
-  (def dataset (atom (read-dataset "data/australian.csv" 14 :header true)))
-  (printfl "Fin read-data outguess_all_0.0.csv\n")
-  (def datasets (atom (read-dataset "data/australian.csv" 14 :header true)))
-  (printfl "Fin read-data outguess_all_1.0.csv\n")
-  (reset! dataset (data/concat-dataset @dataset @datasets))
-  (printfl "Fin data concat\n")
-  (reset! dataset (data/shuffle-dataset @dataset))
-  (printfl "Fin data shuffle\n")
-  (printfl (str (cross-validate @dataset 100 10) "\n"))
-  (System/exit 0))
+(defn -main [& args]
+  (if (= (count args) 6)
+    (do
+      (printfl "Start exp\n")
+      (def dataset (atom (read-dataset (first args) (read-string (second args)) :header (read-string (nth args 2)))))
+      (printfl "Fin read-data outguess_all_0.0.csv\n")
+      (def datasets (atom (read-dataset (nth args 3) (read-string (nth args 4)) :header (read-string (nth args 5)))))
+      (printfl "Fin read-data outguess_all_1.0.csv\n")
+      (reset! dataset (data/concat-dataset @dataset @datasets))
+      (printfl "Fin data concat\n")
+      (reset! dataset (data/shuffle-dataset @dataset))
+      (printfl "Fin data shuffle\n")
+      (printfl (str (cross-validate @dataset 100 10) "\n"))
+      (System/exit 0))))
