@@ -194,9 +194,9 @@
     (do
       (printfl "Start exp\n")
       (def dataset (atom (read-dataset (first args) (read-string (second args)) :header (read-string (nth args 2)))))
-      (printfl "Fin read-data outguess_all_0.0.csv\n")
+      (printfl (str "Fin read-data " (first args) "\n"))
       (def datasets (atom (read-dataset (nth args 3) (read-string (nth args 4)) :header (read-string (nth args 5)))))
-      (printfl "Fin read-data outguess_all_1.0.csv\n")
+      (printfl (str "Fin read-data " (nth args 3) "\n"))
       (reset! dataset (data/concat-dataset @dataset @datasets))
       (printfl "Fin data concat\n")
       (reset! dataset (data/shuffle-dataset @dataset))
