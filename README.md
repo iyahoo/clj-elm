@@ -44,7 +44,7 @@ This will print out L, length each data, TP, FP, TN, FN, Accuracy, Recall and Pr
 Command line
 
 ```shell
-lein run "path/to/negative.csv" location-class header-true-or-false <and same 3 args for positive>
+lein run "path/to/negative.csv" location-class header-true-or-false <and same 3 args for positive> L #-of-cross-validation
 ```
 
 ## License
