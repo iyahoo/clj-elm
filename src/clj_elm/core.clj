@@ -111,12 +111,12 @@
        (sign))))
 
 (defn update-exp [fn key exp]
-  {:pre [(fn? fn) (keyword? key) (map? @exp)]}
+  {:pre [(fn? fn) (keyword? key) (reftype? exp) (map? @exp)]}
   (reset! exp (assoc @exp key (fn (key @exp))))
   exp)
 
 (defn count-rate [pred fact exp]
-  {:pre [(= (Math/abs pred) (Math/abs fact) 1) (map? @exp)]}
+  {:pre [(= (Math/abs pred) (Math/abs fact) 1) (reftype? exp) (map? @exp)]}
   (match [pred fact]
     [ 1  1] (update-exp inc :TP exp)
     [ 1 -1] (update-exp inc :FP exp)
@@ -124,7 +124,7 @@
     [-1  1] (update-exp inc :FN exp)))
 
 (defn confusion-matrix [preds facts exp]
-  {:pre [(coll? preds) (coll? facts) (map? @exp)]}
+  {:pre [(coll? preds) (coll? facts) (reftype? exp) (map? @exp)]}
   (if (or (empty? preds) (empty? facts))
     (let [TP (:TP @exp) FP (:FP @exp)
           TN (:TN @exp) FN (:FN @exp)]
@@ -138,7 +138,7 @@
 
 (defn evaluation
   ([results facts exp]
-   {:pre [(coll? results) (coll? facts) (map? @exp)]}
+   {:pre [(coll? results) (coll? facts) (reftype? exp) (map? @exp)]}
    (let [numd (count results)]
      (confusion-matrix results facts exp))))
 
@@ -164,16 +164,17 @@
          (#(pmap (fn [feature] (predict % feature)) (:features test)))
          (#(evaluation (:classes test) % exp))))))
 
-(defn print-exp-data [expdata]
-  (print "L: " (:L expdata) "\n"
-         "length(train_negative): " (:length-train-negative expdata) "\n"
-         "length(test_negative): " (:length-test-negative expdata) "\n"
-         "length(train_positive): " (:length-train-positive expdata) "\n"
-         "length(test_positive): " (:length-test-positive expdata) "\n"
-         "TP: " (:TP expdata) ", FP: " (:FP expdata) ", TN: " (:TN expdata) ", FN: " (:FN expdata) "\n"
-         "Accracy: " (:Accuracy expdata "\n")
-         "Recall: " (:Recall expdata "\n")
-         "Precision: " (:Precision expdata) "\n\n"))
+(defn print-exp-data [exp]
+  {:pre [(reftype? exp) (map? @exp)]}
+  (print "L: " (:L exp) "\n"
+         "length(train_negative): " (:length-train-negative exp) "\n"
+         "length(test_negative): " (:length-test-negative exp) "\n"
+         "length(train_positive): " (:length-train-positive exp) "\n"
+         "length(test_positive): " (:length-test-positive exp) "\n"
+         "TP: " (:TP exp) ", FP: " (:FP exp) ", TN: " (:TN exp) ", FN: " (:FN exp) "\n"
+         "Accracy: " (:Accuracy exp "\n")
+         "Recall: " (:Recall exp "\n")
+         "Precision: " (:Precision exp) "\n\n"))
 
 (defn cross-validate
   ([dataset L k]
@@ -187,7 +188,6 @@
                    (:Accuracy eva)))
           (reduce +)
           (* (/ 1 k))))))
-
 
 (defn -main [& args]
   (if (= (count args) 8)
