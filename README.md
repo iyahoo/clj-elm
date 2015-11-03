@@ -52,6 +52,3 @@ lein run "path/to/negative.csv" location-class header-true-or-false <and same 3 
 Copyright © 2015 iyhoo.
 
 Distributed under the Eclipse Public License.
-
-
-
