@@ -190,7 +190,7 @@
 
 
 (defn -main [& args]
-  (if (= (count args) 6)
+  (if (= (count args) 8)
     (do
       (printfl "Start exp\n")
       (def dataset (atom (read-dataset (first args) (read-string (second args)) :header (read-string (nth args 2)))))
@@ -201,5 +201,5 @@
       (printfl "Fin data concat\n")
       (reset! dataset (data/shuffle-dataset @dataset))
       (printfl "Fin data shuffle\n")
-      (printfl (str (cross-validate @dataset 100 10) "\n"))
+      (printfl (str (cross-validate @dataset (read-string (nth args 6)) (read-string (nth args 7))) "\n"))
       (System/exit 0))))
