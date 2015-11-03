@@ -41,8 +41,17 @@ Cross validate test:
 
 This will print out L, length each data, TP, FP, TN, FN, Accuracy, Recall and Precision.
 
+Command line
+
+```shell
+lein run "path/to/negative.csv" location-class header-true-or-false <and same 3 args for positive>
+```
+
 ## License
 
 Copyright © 2015 iyhoo.
 
 Distributed under the Eclipse Public License.
+
+
+
