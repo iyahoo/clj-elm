@@ -204,17 +204,17 @@
 
 (defn -main [& args]
   (if (= (count args) 8)
-    (do
+    (let [[datap1 classidx1 header1 datap2 classidx2 header2 L n-of-cv] args]
       (printfl "Start exp\n")
-      (def dataset (atom (read-dataset (first args) (read-string (second args)) :header (read-string (nth args 2)))))
-      (printfl (str "Fin read-data " (first args) "\n"))
-      (def datasets (atom (read-dataset (nth args 3) (read-string (nth args 4)) :header (read-string (nth args 5)))))
-      (printfl (str "Fin read-data " (nth args 3) "\n"))
+      (def dataset (atom (read-dataset datap1 (read-string classidx1) :header (read-string header1))))
+      (printfl (str "Fin read-data " datap1 "\n"))
+      (def datasets (atom (read-dataset datap2 (read-string classidx2) :header (read-string header2))))
+      (printfl (str "Fin read-data " datap1 "\n"))
       (reset! dataset (data/concat-dataset @dataset @datasets))
       (printfl "Fin data concat\n")
       (reset! dataset (data/shuffle-dataset @dataset))
       (printfl "Fin data shuffle\n")
-      (let [result (cross-validate @dataset (read-string (nth args 6)) (read-string (nth args 7)))]
+      (let [result (cross-validate @dataset (read-string L) (read-string n-of-cv))]
         (printfl "Final result:\n")
         (print-exp-data result)
         (flush))
