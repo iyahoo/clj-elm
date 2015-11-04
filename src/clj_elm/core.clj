@@ -176,6 +176,15 @@
          "Recall: " (:Recall exp "\n")
          "Precision: " (:Precision exp) "\n\n"))
 
+(defn +-exp [exp1 exp2]
+  {:pre [(map? exp1) (map? exp2)]}
+  {:length-train-negative (+ (:length-train-negative exp1) (:length-train-negative exp2))
+   :length-test-negative (+ (:length-test-negative exp1) (:length-test-negative exp2))
+   :length-train-positive (+ (:length-train-positive exp1) (:length-train-positive exp2))
+   :length-test-positive (+ (:length-test-positive exp1) (:length-test-positive exp2))
+   :TP (+ (:TP exp1) (:TP exp2)) :FP (+ (:FP exp1) (:FP exp2))
+   :TN (+ (:TN exp1) (:TN exp2)) :FN (+ (:FN exp1) (:FN exp2))})
+
 (defn cross-validate
   ([dataset L k]
    {:pre [(instance? DataSet dataset) (integer? k) (integer? L)]}
