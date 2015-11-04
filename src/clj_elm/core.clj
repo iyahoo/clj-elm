@@ -152,36 +152,37 @@
 
 (defn _cross-validate
   ([dataset a b L]
-   {:pre [(instance? DataSet @dataset) (integer? a) (integer? b) (> b a)]}
-   (let [test (DataSet. (data/extract-list (:classes @dataset) a b)
-                        (data/extract-list (:features @dataset) a b))
-         train (DataSet. (data/remove-list (:classes @dataset) a b)
-                         (data/remove-list (:features @dataset) a b))
-         exp (atom {:num (str "Data " a " to " b)
-                    :length-train-negative (select-count #(= % -1) (:classes train))
-                    :length-test-negative (select-count #(= % -1) (:classes test))
-                    :length-train-positive (select-count #(= % 1) (:classes train))
-                    :length-test-positive (select-count #(= % 1) (:classes test))
-                    :Accuracy 0.0 :Recall 0.0 :Precision 0.0 :TP 0 :FP 0 :TN 0 :FN 0 :L L})]
+   {:pre [(instance? DataSet dataset) (integer? a) (integer? b) (> b a)]}
+   (let [test (DataSet. (data/extract-list (:classes dataset) a b)
+                        (data/extract-list (:features dataset) a b))
+         train (DataSet. (data/remove-list (:classes dataset) a b)
+                         (data/remove-list (:features dataset) a b))
+         exp {:num (str "Data " a " to " b)
+              :length-train-negative (select-count #(= % -1) (:classes train))
+              :length-test-negative (select-count #(= % -1) (:classes test))
+              :length-train-positive (select-count #(= % 1) (:classes train))
+              :length-test-positive (select-count #(= % 1) (:classes test))
+              :Accuracy 0.0 :Recall 0.0 :Precision 0.0 :TP 0 :FP 0 :TN 0 :FN 0 :L L}]
      (-> (train-model train L)
          (#(pmap (fn [feature] (predict % feature)) (:features test)))
          (#(evaluation (:classes test) % exp))))))
 
 (defn print-exp-data [exp]
-  {:pre [(reftype? exp) (map? @exp)]}
+  {:pre [(map? exp)]}
   (print "L: " (:L exp) "\n"
-         "length(train_negative): " (:length-train-negative exp) "\n"
-         "length(test_negative): " (:length-test-negative exp) "\n"
-         "length(train_positive): " (:length-train-positive exp) "\n"
-         "length(test_positive): " (:length-test-positive exp) "\n"
-         "TP: " (:TP exp) ", FP: " (:FP exp) ", TN: " (:TN exp) ", FN: " (:FN exp) "\n"
-         "Accracy: " (:Accuracy exp "\n")
-         "Recall: " (:Recall exp "\n")
-         "Precision: " (:Precision exp) "\n\n"))
+         "length(train_negative):" (:length-train-negative exp) "\n"
+         "length(test_negative):" (:length-test-negative exp) "\n"
+         "length(train_positive):" (:length-train-positive exp) "\n"
+         "length(test_positive):" (:length-test-positive exp) "\n"
+         "TP:" (:TP exp) ", FP:" (:FP exp) ", TN: " (:TN exp) ", FN:" (:FN exp) "\n"
+         "Accracy:" (:Accuracy exp "\n")
+         "Recall:" (:Recall exp "\n")
+         "Precision:" (:Precision exp) "\n\n"))
 
 (defn +-exp [exp1 exp2]
   {:pre [(map? exp1) (map? exp2)]}
-  {:length-train-negative (+ (:length-train-negative exp1) (:length-train-negative exp2))
+  {:L (:L exp1)
+   :length-train-negative (+ (:length-train-negative exp1) (:length-train-negative exp2))
    :length-test-negative (+ (:length-test-negative exp1) (:length-test-negative exp2))
    :length-train-positive (+ (:length-train-positive exp1) (:length-train-positive exp2))
    :length-test-positive (+ (:length-test-positive exp1) (:length-test-positive exp2))
