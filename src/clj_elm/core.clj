@@ -192,15 +192,15 @@
 (defn cross-validate
   ([dataset L k]
    {:pre [(instance? DataSet dataset) (integer? k) (integer? L)]}
-   (let [norm-dataset (atom (DataSet. (:classes dataset) (data/normalize (:features dataset))))
-         numd (count (:classes @norm-dataset)) ; number of data
+   (let [norm-dataset (DataSet. (:classes dataset) (data/normalize (:features dataset)))
+         numd (count (:classes norm-dataset)) ; number of data
          groupn (quot numd k)]                ; number of one group's element
      (->> (take k (iterate #(+ % groupn) 0))
           (pmap #(let [eva (_cross-validate norm-dataset % (+ % (dec groupn)) L)]
                    (dorun [(print-exp-data eva) (flush)])
-                   (:Accuracy eva)))
-          (reduce +)
-          (* (/ 1 k))))))
+                   eva))
+          (reduce +-exp)
+          (exp-result)))))
 
 (defn -main [& args]
   (if (= (count args) 8)
@@ -214,5 +214,8 @@
       (printfl "Fin data concat\n")
       (reset! dataset (data/shuffle-dataset @dataset))
       (printfl "Fin data shuffle\n")
-      (printfl (str (cross-validate @dataset (read-string (nth args 6)) (read-string (nth args 7))) "\n"))
+      (let [result (cross-validate @dataset (read-string (nth args 6)) (read-string (nth args 7)))]
+        (printfl "Final result:\n")
+        (print-exp-data result)
+        (flush))
       (System/exit 0))))
