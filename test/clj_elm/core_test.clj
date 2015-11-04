@@ -144,3 +144,12 @@
     => 3
     (select-count #(= % 1) (:classes (DataSet. [1 1 -1 -1] [[1 1] [1 1] [1 1] [1 1]])))
     => 2))
+
+(facts "test-+-exp"
+  (fact "(+-exp exp1 exp2)"
+    (+-exp {:length-train-negative 100 :length-test-negative 10 :length-train-positive 100 :length-test-positive 10
+            :TP 10 :FP 10 :TN 10 :FN 10}
+           {:length-train-negative 100 :length-test-negative 10 :length-train-positive 100 :length-test-positive 10
+            :TP 10 :FP 10 :TN 10 :FN 10})
+    => {:length-train-negative 200 :length-test-negative 20 :length-train-positive 200 :length-test-positive 20
+        :TP 20 :FP 20 :TN 20 :FN 20}))
