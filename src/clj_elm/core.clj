@@ -111,34 +111,37 @@
        (sign))))
 
 (defn update-exp [fn key exp]
-  {:pre [(fn? fn) (keyword? key) (reftype? exp) (map? @exp)]}
-  (reset! exp (assoc @exp key (fn (key @exp))))
-  exp)
+  {:pre [(fn? fn) (keyword? key) (map? exp)]}
+  (assoc exp key (fn (key exp))))
 
 (defn count-rate [pred fact exp]
-  {:pre [(= (Math/abs pred) (Math/abs fact) 1) (reftype? exp) (map? @exp)]}
+  {:pre [(= (Math/abs pred) (Math/abs fact) 1) (map? exp)]}
   (match [pred fact]
     [ 1  1] (update-exp inc :TP exp)
     [ 1 -1] (update-exp inc :FP exp)
     [-1 -1] (update-exp inc :TN exp)
     [-1  1] (update-exp inc :FN exp)))
 
+(defn exp-result [exp]
+  {:pre [(map? exp)]}
+  (let [TP (:TP exp) FP (:FP exp)
+        TN (:TN exp) FN (:FN exp)]
+    (-> exp
+        (assoc :Accuracy (/ (+ TP TN) (+ TP FP TN FN)))
+        (assoc :Recall (/ TP (+ TP FN)))
+        (assoc :Precision (/ TP (+ TP FP))))))
+
 (defn confusion-matrix [preds facts exp]
-  {:pre [(coll? preds) (coll? facts) (reftype? exp) (map? @exp)]}
+  {:pre [(coll? preds) (coll? facts) (map? exp)]}
   (if (or (empty? preds) (empty? facts))
-    (let [TP (:TP @exp) FP (:FP @exp)
-          TN (:TN @exp) FN (:FN @exp)]
-      (-> @exp
-          (assoc :Accuracy (/ (+ TP TN) (+ TP FP TN FN)))
-          (assoc :Recall (/ TP (+ TP FN)))
-          (#(reset! exp (assoc % :Precision (/ TP (+ TP FP)))))))
+    (exp-result exp)
     (let [pred (first preds)
           fact (first facts)]
       (recur (rest preds) (rest facts) (count-rate pred fact exp)))))
 
 (defn evaluation
   ([results facts exp]
-   {:pre [(coll? results) (coll? facts) (reftype? exp) (map? @exp)]}
+   {:pre [(coll? results) (coll? facts) (map? exp)]}
    (let [numd (count results)]
      (confusion-matrix results facts exp))))
 
