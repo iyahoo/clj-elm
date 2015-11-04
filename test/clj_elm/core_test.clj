@@ -104,37 +104,43 @@
 
 (facts "test-update-exp"
   (fact "(update-exp fn key exp) return reference of exp"
-    (let [exp (atom {:TP 0 :FP 0})]
-      @(update-exp inc :TP exp)
+    (let [exp {:TP 0 :FP 0}]
+      (update-exp inc :TP exp)
       => {:TP 1 :FP 0})))
 
 (facts "test-count-rate"
   (fact "(count-rate pred fact exp)"
-    (let [exp (atom {:TP 0 :FP 0 :TN 10 :FN 10})]
-      (:TP @(count-rate 1 1 exp))
+    (let [exp {:TP 0 :FP 0 :TN 10 :FN 10}]
+      (:TP (count-rate 1 1 exp))
       => 1
-      (:FP @(count-rate 1 -1 exp))
+      (:FP (count-rate 1 -1 exp))
       => 1
-      (:TN @(count-rate -1 -1 exp))
+      (:TN (count-rate -1 -1 exp))
       => 11
-      (:FN @(count-rate -1 1 exp))
+      (:FN (count-rate -1 1 exp))
       => 11)))
+
+(facts "test-exp-result"
+  (fact "(exp-result exp)"
+    (exp-result {:TP 10 :FP 10 :TN 10 :FN 10})
+    => {:TP 10 :FP 10 :TN 10 :FN 10
+        :Accuracy 1/2 :Recall 1/2 :Precision 1/2}))
 
 (facts "test-confusion-matrix"
   (fact "(confusion-matrix preds facts exp)"
-    (let [exp (atom {:TP 0 :FP 0 :TN 0 :FN 0})]
+    (let [exp {:TP 0 :FP 0 :TN 0 :FN 0}]
       (confusion-matrix [1 1 -1 -1] [1 1 -1 -1] exp))
     => {:TP 2, :FP 0, :TN 2, :FN 0, :Accuracy 1, :Recall 1, :Precision 1}))
 
 (facts "test-evaluation"
   (facts "(evaluation results facts)"
-    (let [dummy (atom {:TP 0 :FP 0 :TN 0 :FN 0})]
+    (let [dummy {:TP 0 :FP 0 :TN 0 :FN 0}]
       (:Accuracy (evaluation [1 1 1 1 1 1 1 1 1 1] [1 1 1 1 1 1 1 1 1 1] dummy)))
     => 1
-    (let [dummy (atom {:TP 0 :FP 0 :TN 0 :FN 0})]
+    (let [dummy {:TP 0 :FP 0 :TN 0 :FN 0}]
       (:Accuracy (evaluation [-1 -1 -1 -1 -1 1 1 1 1 1] [1 1 1 1 1 1 1 1 1 1] dummy)))
     => 1/2
-    (let [dummy (atom {:TP 0 :FP 0 :TN 0 :FN 0})]
+    (let [dummy {:TP 0 :FP 0 :TN 0 :FN 0}]
       (:Accuracy (evaluation [-1 -1 -1 -1 -1 -1 -1 -1 -1 1] [1 1 1 1 1 1 1 1 1 1] dummy)))
     => 1/10))
 
@@ -147,9 +153,12 @@
 
 (facts "test-+-exp"
   (fact "(+-exp exp1 exp2)"
-    (+-exp {:length-train-negative 100 :length-test-negative 10 :length-train-positive 100 :length-test-positive 10
+    (+-exp {:L 500
+            :length-train-negative 100 :length-test-negative 10 :length-train-positive 100 :length-test-positive 10
             :TP 10 :FP 10 :TN 10 :FN 10}
-           {:length-train-negative 100 :length-test-negative 10 :length-train-positive 100 :length-test-positive 10
+           {:L 500
+            :length-train-negative 100 :length-test-negative 10 :length-train-positive 100 :length-test-positive 10
             :TP 10 :FP 10 :TN 10 :FN 10})
-    => {:length-train-negative 200 :length-test-negative 20 :length-train-positive 200 :length-test-positive 20
+    => {:L 500
+        :length-train-negative 200 :length-test-negative 20 :length-train-positive 200 :length-test-positive 20
         :TP 20 :FP 20 :TN 20 :FN 20}))
