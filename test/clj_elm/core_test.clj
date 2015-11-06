@@ -24,9 +24,10 @@
 
 (facts "test-make-weights"
   (fact "(make-weights d)"
-    (map #(< -1.0 % 1.0)
-         (make-weights 100))
-    => (take 100 (repeat true))))
+    (reduce #(and %1 %2)
+            (map #(< -1.0 % 1.0)
+                 (make-weights 100)))
+    => true))
 
 (facts "test-make-ass"
   (fact "(make-ass d L)"
