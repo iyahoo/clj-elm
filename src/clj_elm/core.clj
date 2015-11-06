@@ -11,7 +11,7 @@
   "The signum function for a real number x."
   ([x]
    {:pre [(number? x)]
-    :post [(< (Math/abs %) 2)]}
+    :post [(<= (Math/abs %) 1)]}
    (cond
      (> x 0) 1
      (= x 0) 0
@@ -21,23 +21,26 @@
   "Make a d-dimension-random-feature vector. d is number of dimention of
    feature. All elements are in [-1,1]"
   ([d]
-   {:pre [(integer? d)]}
+   {:pre [(integer? d)]
+    :post [(coll? %)]}
    (take d (repeatedly #(dec (rand 2))))))
 
 (defn make-ass
   ([d L]
-   {:pre [(integer? d) (integer? L)]}
+   {:pre [(integer? d) (integer? L)]
+    :post [(coll? %) (coll? (first %)) (float? (first (first %)))]}
    (take L (repeatedly #(make-weights d)))))
 
 (defn make-bs
   ([L]
-   {:pre (integer? L)}
+   {:pre [(integer? L)]
+    :post [(coll? %) (float? (first %))]}
    (take L (repeatedly #(first (make-weights 1))))))
 
 (defn standard-sigmoid
   ([x]
    {:pre [(number? x)]
-    :post [(number? %)]}
+    :post [(float? %)]}
    (/ 1 (+ 1 (Math/exp (- x))))))
 
 (defn bipolar-sigmoid
