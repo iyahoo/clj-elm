@@ -40,7 +40,9 @@
 
 (facts "test-standard-sigmoid"
   (fact "(standard-sigmoid x)"
-    (standard-sigmoid 0) => 0.5))
+    (standard-sigmoid 0) => 0.5
+    (filter #(> % 1.0) (map standard-sigmoid (take 10 (repeatedly #(rand 100)))))
+    => []))
 
 (fact "test-a-hidden-layer-output"
   (fact "(a-hidden-layer-output as_i b_i xs)"
