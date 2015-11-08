@@ -28,7 +28,7 @@
 (defn make-ass
   ([d L]
    {:pre [(integer? d) (integer? L)]
-    :post [(coll? %) (coll? (first %)) (float? (first (first %)))]}
+    :post [(coll? %) (coll? (first %)) (float? (ffirst %))]}
    (take L (repeatedly #(make-weights d)))))
 
 (defn make-bs
