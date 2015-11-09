@@ -178,7 +178,7 @@
          "length(train_positive):" (:length-train-positive exp) "\n"
          "length(test_positive):" (:length-test-positive exp) "\n"
          "TP:" (:TP exp) ", FP:" (:FP exp) ", TN: " (:TN exp) ", FN:" (:FN exp) "\n"
-         "Accracy:" (:Accuracy exp "\n")
+         "Accuracy:" (:Accuracy exp "\n")
          "Recall:" (:Recall exp "\n")
          "Precision:" (:Precision exp) "\n\n"))
 
