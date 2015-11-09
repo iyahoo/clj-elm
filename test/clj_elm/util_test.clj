@@ -1,4 +1,4 @@
-(ns clj-elm.core-test
+(ns clj-elm.util-test
   (:require [clj-elm.util :refer :all]
             [midje.sweet :refer :all]
             [midje.repl :refer (autotest load-facts)]))
