@@ -1,5 +1,6 @@
 # clj-elm
 [![Build Status](https://secure.travis-ci.org/iyahoo/clj-elm.png)](http://travis-ci.org/iyahoo/clj-elm)
+[![Coverage Status](https://coveralls.io/repos/iyahoo/clj-elm/badge.svg?branch=master&service=github)](https://coveralls.io/github/iyahoo/clj-elm?branch=master)
 
 This is Extreme Learning Machine on Clojure. For only 2 class classification.
 
