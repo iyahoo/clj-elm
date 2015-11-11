@@ -3,6 +3,11 @@
             [midje.sweet :refer :all]
             [midje.repl :refer (autotest load-facts)]))
 
+(facts "test-printfl"
+  (fact "(printfl obj)"
+    (printfl 3)
+    => [nil nil]))
+
 (facts "test-reftype?"
   (fact "(reftype? obj)"
     (reftype? 3)
