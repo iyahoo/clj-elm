@@ -57,7 +57,8 @@
   "Return output of hidden-layer_i with xs. As_i is d-dimension. B_i is number.
    Xs is d-dimension."
   ([as_i b_i xs]
-   {:pre [(coll? as_i) (number? b_i) (coll? xs)]}
+   {:pre [(coll? as_i) (number? b_i) (coll? xs)]
+    :post [(float? %)]}
    (g (+ (c/inner-product as_i xs)
          b_i))))
 
@@ -72,7 +73,8 @@
 
 (defn pseudo-inverse-matrix
   ([mat]
-   {:pre [(coll? mat) (coll? (first mat))]}
+   {:pre [(coll? mat) (coll? (first mat))]
+    :post [(c/matrix? %)]}
    (let [matrix (c/matrix mat)
          transmat (c/trans matrix)
          n (c/nrow matrix)
@@ -92,7 +94,8 @@
 
 (defn train-model
   ([dataset L & {:keys [norm] :or {norm false}}]
-   {:pre [(instance? DataSet dataset) (integer? L)]}
+   {:pre [(instance? DataSet dataset) (integer? L)]
+    :post [(instance? Model %)]}
    (let [normf (if norm data/normalize identity)
          d (data/num-of-feature dataset)
          ass (make-ass d L)
@@ -105,7 +108,8 @@
 
 (defn predict
   ([model xs]
-   {:pre [(instance? Model model) (coll? xs)]}
+   {:pre [(instance? Model model) (coll? xs)]
+    :post [(integer? %)]}
    (predict (:ass model) (:bs model) (:betas model) xs))
   ([ass bs betas xs]
    {:pre [(coll? ass) (coll? (first ass)) (coll? bs) (coll? betas) (coll? xs)]}
@@ -114,11 +118,13 @@
        (sign))))
 
 (defn update-exp [fn key exp]
-  {:pre [(fn? fn) (keyword? key) (map? exp)]}
+  {:pre [(fn? fn) (keyword? key) (map? exp)]
+   :post [(map? %)]}
   (assoc exp key (fn (key exp))))
 
 (defn count-rate [pred fact exp]
-  {:pre [(= (Math/abs pred) (Math/abs fact) 1) (map? exp)]}
+  {:pre [(= (Math/abs pred) (Math/abs fact) 1) (map? exp)]
+   :post [(map? %)]}
   (match [pred fact]
     [ 1  1] (update-exp inc :TP exp)
     [ 1 -1] (update-exp inc :FP exp)
@@ -126,7 +132,8 @@
     [-1  1] (update-exp inc :FN exp)))
 
 (defn exp-result [exp]
-  {:pre [(map? exp)]}
+  {:pre [(map? exp)]
+   :post [(map? %)]}
   (let [TP (:TP exp) FP (:FP exp)
         TN (:TN exp) FN (:FN exp)]
     (-> exp
@@ -135,7 +142,9 @@
         (assoc :Precision (/ TP (+ TP FP))))))
 
 (defn confusion-matrix [preds facts exp]
-  {:pre [(coll? preds) (coll? facts) (map? exp)]}
+  {:pre [(coll? preds) (coll? facts) (map? exp)]
+   ;; :post [(map? %)]
+   }
   (if (or (empty? preds) (empty? facts))
     (exp-result exp)
     (let [pred (first preds)
@@ -144,13 +153,15 @@
 
 (defn evaluation
   ([results facts exp]
-   {:pre [(coll? results) (coll? facts) (map? exp)]}
+   {:pre [(coll? results) (coll? facts) (map? exp)]
+    :post [(map? %)]}
    (let [numd (count results)]
      (confusion-matrix results facts exp))))
 
 (defn select-count
   ([cond coll]
-   {:pre [(fn? cond) (coll? coll)]}
+   {:pre [(fn? cond) (coll? coll)]
+    :post [(integer? %)]}
    (count (filter cond coll))))
 
 (defn _cross-validate
@@ -194,7 +205,8 @@
 
 (defn cross-validate
   ([dataset L k]
-   {:pre [(instance? DataSet dataset) (integer? k) (integer? L)]}
+   {:pre [(instance? DataSet dataset) (integer? k) (integer? L)]
+    :post [(map? %)]}
    (let [norm-dataset (DataSet. (:classes dataset) (data/normalize (:features dataset)))
          numd (count (:classes norm-dataset)) ; number of data
          groupn (quot numd k)]                ; number of one group's element
@@ -206,6 +218,7 @@
           (exp-result)))))
 
 (defn -main [& args]
+  {:pre [(string? (first args))]}
   (if (= (count args) 8)
     (let [[datap1 classidx1 header1 datap2 classidx2 header2 L n-of-cv] args]
       (printfl "Start exp\n")
