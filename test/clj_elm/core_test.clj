@@ -154,6 +154,15 @@
     (select-count #(= % 1) (:classes (DataSet. [1 1 -1 -1] [[1 1] [1 1] [1 1] [1 1]])))
     => 2))
 
+(facts "test-_print-exp-data"
+  (fact "(_print-exp-data exp)"
+    (_print-exp-data {:L 10
+                      :length-train-negative 10 :length-train-positive 10
+                      :length-test-negative 10 :length-test-positive 10
+                      :TP 10 :FP 10 :TN 10 :FN 10
+                      :Accuracy 1/2 :Recall 1/2 :Precision 1/2})
+    => "L:10\n length(train_negative): 10\n length(test_negative): 10\n length(train_positive): 10\n length(test_positive): 10\n TP: 10, FP: 10, TN: 10, FN: 10\n Accuracy: 1/2,Recall: 1/2,Precision: 1/2\n\n"))
+
 (facts "test-+-exp"
   (fact "(+-exp exp1 exp2)"
     (+-exp {:L 500
