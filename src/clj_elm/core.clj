@@ -3,7 +3,8 @@
             [clj-elm.data :as data]
             [clj-elm.util :refer :all]
             [incanter.core :as c :exclude [update]]
-            [clojure.core.match :refer [match]])
+            [clojure.core.match :refer [match]]
+            [taoensso.timbre.profiling :refer [profile p]])
   (:import [clj_elm.data DataSet])
   (:gen-class))
 
