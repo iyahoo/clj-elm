@@ -181,20 +181,27 @@
          (#(pmap (fn [feature] (predict % feature)) (:features test)))
          (#(evaluation (:classes test) % exp))))))
 
+(defn _print-exp-data [exp]
+  {:pre [(map? exp)]
+   :post [(string? %)]}
+  (str "L:" (:L exp) "\n"
+       " length(train_negative): " (:length-train-negative exp) "\n"
+       " length(test_negative): " (:length-test-negative exp) "\n"
+       " length(train_positive): " (:length-train-positive exp) "\n"
+       " length(test_positive): " (:length-test-positive exp) "\n"
+       " TP: " (:TP exp) ", FP: " (:FP exp) ", TN: " (:TN exp) ", FN: " (:FN exp) "\n"
+       " Accuracy: " (:Accuracy exp)
+       ",Recall: " (:Recall exp)
+       ",Precision: " (:Precision exp) "\n\n"))
+
 (defn print-exp-data [exp]
-  {:pre [(map? exp)]}
-  (print "L: " (:L exp) "\n"
-         "length(train_negative):" (:length-train-negative exp) "\n"
-         "length(test_negative):" (:length-test-negative exp) "\n"
-         "length(train_positive):" (:length-train-positive exp) "\n"
-         "length(test_positive):" (:length-test-positive exp) "\n"
-         "TP:" (:TP exp) ", FP:" (:FP exp) ", TN: " (:TN exp) ", FN:" (:FN exp) "\n"
-         "Accuracy:" (:Accuracy exp "\n")
-         "Recall:" (:Recall exp "\n")
-         "Precision:" (:Precision exp) "\n\n"))
+  {:pre [(map? exp)]
+   :post [(nil? %)]}
+  (print (_print-exp-data exp)))
 
 (defn +-exp [exp1 exp2]
-  {:pre [(map? exp1) (map? exp2)]}
+  {:pre [(map? exp1) (map? exp2)]
+   :post [(map? %)]}
   {:L (:L exp1)
    :length-train-negative (+ (:length-train-negative exp1) (:length-train-negative exp2))
    :length-test-negative (+ (:length-test-negative exp1) (:length-test-negative exp2))
