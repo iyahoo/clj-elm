@@ -235,19 +235,20 @@
 
 (defn -main [& args]
   {:pre [(string? (first args))]}
-  (if (= (count args) 8)
-    (let [[datap1 classidx1 header1 datap2 classidx2 header2 L n-of-cv] args]
-      (printfl "Start exp\n")
-      (def dataset (atom (read-dataset datap1 (read-string classidx1) :header (read-string header1))))
-      (printfl (str "Fin read-data " datap1 "\n"))
-      (def datasets (atom (read-dataset datap2 (read-string classidx2) :header (read-string header2))))
-      (printfl (str "Fin read-data " datap1 "\n"))
-      (reset! dataset (data/concat-dataset @dataset @datasets))
-      (printfl "Fin data concat\n")
-      (reset! dataset (data/shuffle-dataset @dataset))
-      (printfl "Fin data shuffle\n")
-      (let [result (cross-validate @dataset (read-string L) (read-string n-of-cv))]
-        (printfl "Final result:\n")
-        (print-exp-data result)
-        (flush))
-      (System/exit 0))))
+  (p :main
+     (if (= (count args) 8)
+       (let [[datap1 classidx1 header1 datap2 classidx2 header2 L n-of-cv] args]
+         (printfl "Start exp\n")
+         (def dataset (atom (read-dataset datap1 (read-string classidx1) :header (read-string header1))))
+         (printfl (str "Fin read-data " datap1 "\n"))
+         (def datasets (atom (read-dataset datap2 (read-string classidx2) :header (read-string header2))))
+         (printfl (str "Fin read-data " datap1 "\n"))
+         (reset! dataset (data/concat-dataset @dataset @datasets))
+         (printfl "Fin data concat\n")
+         (reset! dataset (data/shuffle-dataset @dataset))
+         (printfl "Fin data shuffle\n")
+         (let [result (cross-validate @dataset (read-string L) (read-string n-of-cv))]
+           (printfl "Final result:\n")
+           (print-exp-data result)
+           (flush))
+         (System/exit 0)))))
