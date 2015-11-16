@@ -3,7 +3,8 @@
             [clj-elm.data :as data]
             [clj-elm.util :refer :all]
             [incanter.core :as c :exclude [update]]
-            [clojure.core.match :refer [match]])
+            [clojure.core.match :refer [match]]
+            [taoensso.timbre.profiling :refer [profile p]])
   (:import [clj_elm.data DataSet])
   (:gen-class))
 
@@ -59,8 +60,9 @@
   ([as_i b_i xs]
    {:pre [(coll? as_i) (number? b_i) (coll? xs)]
     :post [(float? %)]}
-   (g (+ (c/inner-product as_i xs)
-         b_i))))
+   (p :a-hidden-layer-output
+      (g (+ (c/inner-product as_i xs)
+            b_i)))))
 
 (defn hidden-layer-output-matrix
   "Ass is d-L-dimension. Xss is d-L-dimesion. Bs is L-dimension."
@@ -75,20 +77,21 @@
   ([mat]
    {:pre [(coll? mat) (coll? (first mat))]
     :post [(c/matrix? %)]}
-   (let [matrix (c/matrix mat)
-         transmat (c/trans matrix)
-         n (c/nrow matrix)
-         p (c/ncol matrix)]
-     (cond
-       (= n p) (c/solve matrix)
-       (> n p) (-> transmat
-                   (c/mmult matrix)
-                   (c/solve)
-                   (c/mmult transmat))
-       (< n p) (-> matrix
-                   (c/mmult transmat)
-                   (c/solve)
-                   (c/mmult matrix))))))
+   (p :pseudo-inverse-matrix
+      (let [matrix (c/matrix mat)
+            transmat (c/trans matrix)
+            n (c/nrow matrix)
+            p (c/ncol matrix)]
+        (cond
+          (= n p) (c/solve matrix)
+          (> n p) (-> transmat
+                      (c/mmult matrix)
+                      (c/solve)
+                      (c/mmult transmat))
+          (< n p) (-> matrix
+                      (c/mmult transmat)
+                      (c/solve)
+                      (c/mmult matrix)))))))
 
 (defrecord Model [ass bs betas])
 
@@ -120,26 +123,29 @@
 (defn update-exp [fn key exp]
   {:pre [(fn? fn) (keyword? key) (map? exp)]
    :post [(map? %)]}
-  (assoc exp key (fn (key exp))))
+  (p :update-exp
+     (assoc exp key (fn (key exp)))))
 
 (defn count-rate [pred fact exp]
   {:pre [(= (Math/abs pred) (Math/abs fact) 1) (map? exp)]
    :post [(map? %)]}
-  (match [pred fact]
-    [ 1  1] (update-exp inc :TP exp)
-    [ 1 -1] (update-exp inc :FP exp)
-    [-1 -1] (update-exp inc :TN exp)
-    [-1  1] (update-exp inc :FN exp)))
+  (p :count-rate
+     (match [pred fact]
+       [ 1  1] (update-exp inc :TP exp)
+       [ 1 -1] (update-exp inc :FP exp)
+       [-1 -1] (update-exp inc :TN exp)
+       [-1  1] (update-exp inc :FN exp))))
 
 (defn exp-result [exp]
   {:pre [(map? exp)]
    :post [(map? %)]}
-  (let [TP (:TP exp) FP (:FP exp)
-        TN (:TN exp) FN (:FN exp)]
-    (-> exp
-        (assoc :Accuracy (/ (+ TP TN) (+ TP FP TN FN)))
-        (assoc :Recall (/ TP (+ TP FN)))
-        (assoc :Precision (/ TP (+ TP FP))))))
+  (p :exp-result
+     (let [TP (:TP exp) FP (:FP exp)
+           TN (:TN exp) FN (:FN exp)]
+       (-> exp
+           (assoc :Accuracy (/ (+ TP TN) (+ TP FP TN FN)))
+           (assoc :Recall (/ TP (+ TP FN)))
+           (assoc :Precision (/ TP (+ TP FP)))))))
 
 (defn confusion-matrix [preds facts exp]
   {:pre [(coll? preds) (coll? facts) (map? exp)]
@@ -156,13 +162,15 @@
    {:pre [(coll? results) (coll? facts) (map? exp)]
     :post [(map? %)]}
    (let [numd (count results)]
-     (confusion-matrix results facts exp))))
+     (p :confusion-matrix
+        (confusion-matrix results facts exp)))))
 
 (defn select-count
   ([cond coll]
    {:pre [(fn? cond) (coll? coll)]
     :post [(integer? %)]}
-   (count (filter cond coll))))
+   (p :select-count
+      (count (filter cond coll)))))
 
 (defn _cross-validate
   ([dataset a b L]
@@ -202,13 +210,14 @@
 (defn +-exp [exp1 exp2]
   {:pre [(map? exp1) (map? exp2)]
    :post [(map? %)]}
-  {:L (:L exp1)
-   :length-train-negative (+ (:length-train-negative exp1) (:length-train-negative exp2))
-   :length-test-negative (+ (:length-test-negative exp1) (:length-test-negative exp2))
-   :length-train-positive (+ (:length-train-positive exp1) (:length-train-positive exp2))
-   :length-test-positive (+ (:length-test-positive exp1) (:length-test-positive exp2))
-   :TP (+ (:TP exp1) (:TP exp2)) :FP (+ (:FP exp1) (:FP exp2))
-   :TN (+ (:TN exp1) (:TN exp2)) :FN (+ (:FN exp1) (:FN exp2))})
+  (p :+-exp
+   {:L (:L exp1)
+    :length-train-negative (+ (:length-train-negative exp1) (:length-train-negative exp2))
+    :length-test-negative (+ (:length-test-negative exp1) (:length-test-negative exp2))
+    :length-train-positive (+ (:length-train-positive exp1) (:length-train-positive exp2))
+    :length-test-positive (+ (:length-test-positive exp1) (:length-test-positive exp2))
+    :TP (+ (:TP exp1) (:TP exp2)) :FP (+ (:FP exp1) (:FP exp2))
+    :TN (+ (:TN exp1) (:TN exp2)) :FN (+ (:FN exp1) (:FN exp2))}))
 
 (defn cross-validate
   ([dataset L k]
@@ -226,19 +235,20 @@
 
 (defn -main [& args]
   {:pre [(string? (first args))]}
-  (if (= (count args) 8)
-    (let [[datap1 classidx1 header1 datap2 classidx2 header2 L n-of-cv] args]
-      (printfl "Start exp\n")
-      (def dataset (atom (read-dataset datap1 (read-string classidx1) :header (read-string header1))))
-      (printfl (str "Fin read-data " datap1 "\n"))
-      (def datasets (atom (read-dataset datap2 (read-string classidx2) :header (read-string header2))))
-      (printfl (str "Fin read-data " datap1 "\n"))
-      (reset! dataset (data/concat-dataset @dataset @datasets))
-      (printfl "Fin data concat\n")
-      (reset! dataset (data/shuffle-dataset @dataset))
-      (printfl "Fin data shuffle\n")
-      (let [result (cross-validate @dataset (read-string L) (read-string n-of-cv))]
-        (printfl "Final result:\n")
-        (print-exp-data result)
-        (flush))
-      (System/exit 0))))
+  (p :main
+     (if (= (count args) 8)
+       (let [[datap1 classidx1 header1 datap2 classidx2 header2 L n-of-cv] args]
+         (printfl "Start exp\n")
+         (def dataset (atom (read-dataset datap1 (read-string classidx1) :header (read-string header1))))
+         (printfl (str "Fin read-data " datap1 "\n"))
+         (def datasets (atom (read-dataset datap2 (read-string classidx2) :header (read-string header2))))
+         (printfl (str "Fin read-data " datap1 "\n"))
+         (reset! dataset (data/concat-dataset @dataset @datasets))
+         (printfl "Fin data concat\n")
+         (reset! dataset (data/shuffle-dataset @dataset))
+         (printfl "Fin data shuffle\n")
+         (let [result (cross-validate @dataset (read-string L) (read-string n-of-cv))]
+           (printfl "Final result:\n")
+           (print-exp-data result)
+           (flush))
+         (System/exit 0)))))
