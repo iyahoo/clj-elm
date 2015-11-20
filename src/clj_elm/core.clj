@@ -44,12 +44,6 @@
     :post [(float? %)]}
    (/ 1 (+ 1 (Math/exp (- x))))))
 
-;; (defn bipolar-sigmoid
-;;   ([x]
-;;    {:pre [(number? x)]
-;;     :post [(number? %)]}
-;;    (dec (/ 2 (+ 1 (Math/exp (- x)))))))
-
 (defn g
   ([x]
    (standard-sigmoid x)))
