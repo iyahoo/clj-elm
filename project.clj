@@ -14,5 +14,5 @@
                  [svm-clj "0.1.3"]
                  [criterium "0.4.3"]
                  [com.taoensso/timbre "4.1.4"]]
-  :global-vars {*assert* false}
+  :global-vars {*assert* true}
   :main clj-elm.core)
