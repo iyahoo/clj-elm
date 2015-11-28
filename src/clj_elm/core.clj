@@ -20,6 +20,12 @@
      (= x 0) 0
      :else -1)))
 
+(defn reverse-sign
+  ([x]
+   {:pre [(number? x)]
+    :post [(<= (Math/abs %) 1)]}
+   (- (sign x))))
+
 (defn make-weights
   "Make a d-dimension-random-feature vector. d is number of dimention of
    feature. All elements are in [-1,1]"
