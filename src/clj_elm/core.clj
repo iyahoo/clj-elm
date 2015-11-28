@@ -118,9 +118,12 @@
    (predict (:ass model) (:bs model) (:betas model) xs))
   ([ass bs betas xs]
    {:pre [(coll? ass) (coll? (first ass)) (coll? bs) (coll? betas) (coll? xs)]}
-   (-> (pmap #(* %1 (a-hidden-layer-output %2 %3 xs)) betas ass bs)
-       (c/sum)
-       (sign))))
+   (let [signf (if *sign-reverse*
+                 reverse-sign
+                 sign)]
+     (-> (pmap #(* %1 (a-hidden-layer-output %2 %3 xs)) betas ass bs)
+         (c/sum)
+         (signf)))))
 
 (defn update-exp [fn key exp]
   {:pre [(fn? fn) (keyword? key) (map? exp)]
