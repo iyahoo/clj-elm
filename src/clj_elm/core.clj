@@ -8,6 +8,8 @@
   (:import [clj_elm.data DataSet])
   (:gen-class))
 
+(def ^:dynamic *sign-reverse* false)
+
 (defn sign
   "The signum function for a real number x."
   ([x]
