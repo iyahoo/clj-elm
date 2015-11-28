@@ -111,7 +111,15 @@
       => -1)
     (let [model (train-model libsvmlian 20 :norm true)]
       (predict model (first (normalize (:features libsvmlian))))
-      => -1)))
+      => -1))
+  (fact "(binding [*sign-reverse* true] (train-model dataset l))"
+    (binding [*sign-reverse* true]
+      (let [model (train-model australian 20 :norm true)]
+        (predict model (first (normalize (:features australian))))
+        => 1)
+      (let [model (train-model libsvmlian 20 :norm true)]
+        (predict model (first (normalize (:features libsvmlian))))
+        => 1))))
 
 (facts "test-update-exp"
   (fact "(update-exp fn key exp) return reference of exp"
