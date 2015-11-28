@@ -22,6 +22,14 @@
     (sign -0.00001) => -1
     (sign 0)        =>  0))
 
+(facts "test-reverse-sign"
+  (fact "(reverse-sign x)"
+    (reverse-sign 100)      => -1
+    (reverse-sign 0.1)      => -1
+    (reverse-sign -100)     =>  1
+    (reverse-sign -0.00001) =>  1
+    (reverse-sign 0)        =>  0))
+
 (facts "test-make-weights"
   (fact "(make-weights d)"
     (reduce #(and %1 %2)
