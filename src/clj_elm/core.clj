@@ -242,6 +242,15 @@
           (reduce +-exp)
           (exp-result)))))
 
+(defn model-check
+  "At first make model from dataset as a train-dataset, then it validate accuracy of model using dataset as a test-dataset."
+  ([dataset L]
+   {:pre [(instance? DataSet dataset) (integer? L)]
+    :post [(map? %)]}
+   (p :model-check
+      (let [norm-dataset (DataSet. (:classes dataset) (data/normalize (:features dataset)))]
+        (train-to-eval L norm-dataset norm-dataset)))))
+
 (defn -main [& args]
   {:pre [(string? (first args))]}
   (p :main
