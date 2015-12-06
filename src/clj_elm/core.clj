@@ -177,6 +177,11 @@
    (p :select-count
       (count (filter cond coll)))))
 
+(defn train-to-eval [L train-data test-data exp]
+  (-> (train-model train-data L)
+      (#(pmap (fn [feature] (predict % feature)) (:features test-data)))
+      (#(evaluation (:classes test-data) % exp))))
+
 (defn _cross-validate
   ([dataset a b L]
    {:pre [(instance? DataSet dataset) (integer? a) (integer? b) (> b a)]}
@@ -190,9 +195,7 @@
               :length-train-positive (select-count #(= % 1) (:classes train))
               :length-test-positive (select-count #(= % 1) (:classes test))
               :Accuracy 0.0 :Recall 0.0 :Precision 0.0 :TP 0 :FP 0 :TN 0 :FN 0 :L L}]
-     (-> (train-model train L)
-         (#(pmap (fn [feature] (predict % feature)) (:features test)))
-         (#(evaluation (:classes test) % exp))))))
+     (train-to-eval L train test exp))))
 
 (defn _print-exp-data [exp]
   {:pre [(map? exp)]
