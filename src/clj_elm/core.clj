@@ -152,15 +152,17 @@
            (assoc :Recall (/ TP (+ TP FN)))
            (assoc :Precision (/ TP (+ TP FP)))))))
 
-(defn confusion-matrix [preds facts exp]
-  {:pre [(coll? preds) (coll? facts) (map? exp)]
-   ;; :post [(map? %)]
-   }
+(defn _confusion-matrix [preds facts exp]
   (if (or (empty? preds) (empty? facts))
     (exp-result exp)
     (let [pred (first preds)
           fact (first facts)]
       (recur (rest preds) (rest facts) (count-rate pred fact exp)))))
+
+(defn confusion-matrix [preds facts exp]
+  {:pre [(coll? preds) (coll? facts) (map? exp)]
+   :post [(map? %)]}
+  (_confusion-matrix preds facts exp))
 
 (defn evaluation
   ([results facts exp]
