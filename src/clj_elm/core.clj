@@ -179,10 +179,15 @@
    (p :select-count
       (count (filter cond coll)))))
 
-(defn train-to-eval [L train-data test-data exp]
-  (-> (train-model train-data L)
-      (#(pmap (fn [feature] (predict % feature)) (:features test-data)))
-      (#(evaluation (:classes test-data) % exp))))
+(defn train-to-eval [L train-data test-data]
+  (let [exp {:length-train-negative (select-count #(= % -1) (:classes train-data))
+             :length-test-negative (select-count #(= % -1) (:classes test-data))
+             :length-train-positive (select-count #(= % 1) (:classes train-data))
+             :length-test-positive (select-count #(= % 1) (:classes test-data))
+             :Accuracy 0.0 :Recall 0.0 :Precision 0.0 :TP 0 :FP 0 :TN 0 :FN 0 :L L}]
+    (-> (train-model train-data L)
+        (#(pmap (fn [feature] (predict % feature)) (:features test-data)))
+        (#(evaluation (:classes test-data) % exp)))))
 
 (defn _cross-validate
   ([dataset a b L]
@@ -190,14 +195,8 @@
    (let [test (DataSet. (data/extract-list (:classes dataset) a b)
                         (data/extract-list (:features dataset) a b))
          train (DataSet. (data/remove-list (:classes dataset) a b)
-                         (data/remove-list (:features dataset) a b))
-         exp {:num (str "Data " a " to " b)
-              :length-train-negative (select-count #(= % -1) (:classes train))
-              :length-test-negative (select-count #(= % -1) (:classes test))
-              :length-train-positive (select-count #(= % 1) (:classes train))
-              :length-test-positive (select-count #(= % 1) (:classes test))
-              :Accuracy 0.0 :Recall 0.0 :Precision 0.0 :TP 0 :FP 0 :TN 0 :FN 0 :L L}]
-     (train-to-eval L train test exp))))
+                         (data/remove-list (:features dataset) a b))]
+     (train-to-eval L train test))))
 
 (defn _print-exp-data [exp]
   {:pre [(map? exp)]
