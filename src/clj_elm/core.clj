@@ -184,7 +184,7 @@
 
 (defn _cross-validate
   ([dataset a b L]
-   {:pre [(instance? DataSet dataset) (integer? a) (integer? b) (> b a)]}
+   {:pre [(instance? DataSet dataset) (integer? a) (integer? b) (> b a) (integer? L)]}
    (let [test (DataSet. (data/extract-list (:classes dataset) a b)
                         (data/extract-list (:features dataset) a b))
          train (DataSet. (data/remove-list (:classes dataset) a b)
