@@ -243,7 +243,7 @@
           (exp-result)))))
 
 (defn model-check
-  "At first make model from dataset as a train-dataset, then it validate accuracy of model using dataset as a test-dataset."
+  "At first, make model from dataset as a train-dataset, then it validate accuracy of model using dataset as a test-dataset."
   ([dataset L]
    {:pre [(instance? DataSet dataset) (integer? L)]
     :post [(map? %)]}
