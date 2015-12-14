@@ -5,7 +5,8 @@
             [incanter.core :as c :exclude [update]]
             [clojure.core.match :refer [match]]
             [taoensso.timbre.profiling :refer [profile p]])
-  (:import [clj_elm.data DataSet])
+  (:import [clj_elm.data DataSet]
+           [Jama Matrix])
   (:gen-class))
 
 (def ^:dynamic *sign-reverse* false)
@@ -256,7 +257,7 @@
   (p :main
      (if (= (count args) 9)
        (let [[datap1 classidx1 header1 datap2 classidx2 header2 L n-of-cv sign-m] args]
-         (binding [*sign-reverse* sign-m]
+         (binding [*sign-reverse* (read-string sign-m)]
            (printfl "Start exp\n")
            (def dataset (atom (read-dataset datap1 (read-string classidx1) :header (read-string header1))))
            (printfl (str "Fin read-data " datap1 "\n"))
