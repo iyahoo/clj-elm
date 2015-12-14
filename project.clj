@@ -13,6 +13,7 @@
                  [midje "1.7.0-beta1"]
                  [svm-clj "0.1.3"]
                  [criterium "0.4.3"]
-                 [com.taoensso/timbre "4.1.4"]]
+                 [com.taoensso/timbre "4.1.4"]
+                 [gov.nist.math/jama "1.0.3"]]
   :global-vars {*assert* true}
   :main clj-elm.core)
