@@ -76,6 +76,17 @@
     :post [(= (count (first %)) (count ass)) (= (count %) (count xss))]}
    (pmap (fn [xs_i] (pmap #(a-hidden-layer-output %1 %2 xs_i) ass bs)) xss)))
 
+(defn make-double-jarray
+  ([array2d]
+   {:pre [(coll? array2d) (coll? (first array2d))]}
+   (let [newmat (Matrix. (make-array Double/TYPE (count array2d) (count (first array2d))))]
+     ;; (dorun (print (format "height %d, width %d\n" (.getRowDimension newmat) (.getColumnDimension newmat))))  ;; for debug
+     (dorun
+      (for [x (range (.getRowDimension newmat))
+            y (range (.getColumnDimension newmat))]
+        (.set newmat x y (nth (nth array2d x) y))))
+     newmat)))
+
 (defn pseudo-inverse-matrix
   ([mat]
    {:pre [(coll? mat) (coll? (first mat))]
