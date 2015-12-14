@@ -42,7 +42,7 @@
     (count (make-ass 10 3)) => 3
     (count (first (make-ass 10 3))) => 10))
 
-(fact "test-make-bs"
+(facts "test-make-bs"
   (fact "(make-bs L)"
     (count (make-bs 3)) => 3))
 
@@ -52,11 +52,11 @@
     (filter #(> % 1.0) (map standard-sigmoid (take 10 (repeatedly #(rand 100)))))
     => []))
 
-(fact "test-a-hidden-layer-output"
+(facts "test-a-hidden-layer-output"
   (fact "(a-hidden-layer-output as_i b_i xs)"
     (a-hidden-layer-output [0 0 0] 0 [0 0 0]) => 0.5))
 
-(fact "test-hidden-layer-output-matrix"
+(facts "test-hidden-layer-output-matrix"
   (fact "(hidden-layer-output-matrix ass bs xss)"
     (hidden-layer-output-matrix
      [[0 0 0] [0 0 0] [0 0 0]]
@@ -74,11 +74,14 @@
         [0.5 0.5 0.5]
         [0.5 0.5 0.5]]))
 
+(facts "test-make-double-jarray"
+  (fact "(make-double-jarray array2h)"))
+
 (defn roundn [^Double x ^Integer n]
   (-> (BigDecimal. x)
       (.setScale n BigDecimal/ROUND_HALF_UP)))
 
-(fact "test-pseudo-inverse-matrix"
+(facts "test-pseudo-inverse-matrix"
   (fact "(pseudo-inverse-matrix mat)"
     (let [A [[2 0 0]
              [0 2 0]
