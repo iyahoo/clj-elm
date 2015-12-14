@@ -6,7 +6,7 @@
             [clojure.core.match :refer [match]]
             [taoensso.timbre.profiling :refer [profile p]])
   (:import [clj_elm.data DataSet]
-           [Jama Matrix])
+           [Jama Matrix LUDecomposition])
   (:gen-class))
 
 (def ^:dynamic *sign-reverse* false)
