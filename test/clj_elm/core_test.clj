@@ -75,7 +75,12 @@
         [0.5 0.5 0.5]]))
 
 (facts "test-make-double-jarray"
-  (fact "(make-double-jarray array2h)"))
+  (fact "(make-double-jarray array2h)"
+    (let [m (make-double-jarray [[1.0 2.0 3.0] [4.0 5.0 6.0] [7.0 8.0 9.0]])]
+      (for [x [0 1 2]
+            y [0 1 2]]
+        (.get m x y))
+      => [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0])))
 
 (defn roundn [^Double x ^Integer n]
   (-> (BigDecimal. x)
