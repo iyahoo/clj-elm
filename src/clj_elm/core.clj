@@ -9,7 +9,15 @@
            [Jama Matrix LUDecomposition])
   (:gen-class))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; define dynamic
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (def ^:dynamic *sign-reverse* false)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ELM core functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn sign
   "The signum function for a real number x."
@@ -107,6 +115,10 @@
                       (c/solve)
                       (c/mmult matrix)))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; for model and predict
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defrecord Model [ass bs betas])
 
 (defn train-model
@@ -136,6 +148,10 @@
      (-> (pmap #(* %1 (a-hidden-layer-output %2 %3 xs)) betas ass bs)
          (c/sum)
          (signf)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; result
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn update-exp [fn key exp]
   {:pre [(fn? fn) (keyword? key) (map? exp)]
@@ -201,6 +217,19 @@
         (#(pmap (fn [feature] (predict % feature)) (:features test-data)))
         (#(evaluation (:classes test-data) % exp)))))
 
+(defn model-check
+  "At first, make model from dataset as a train-dataset, then it validate accuracy of model using dataset as a test-dataset."
+  ([dataset L]
+   {:pre [(instance? DataSet dataset) (integer? L)]
+    :post [(map? %)]}
+   (p :model-check
+      (let [norm-dataset (DataSet. (:classes dataset) (data/normalize (:features dataset)))]
+        (train-to-eval L norm-dataset norm-dataset)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; cross validation
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn _cross-validate
   ([dataset a b L]
    {:pre [(instance? DataSet dataset) (integer? a) (integer? b) (> b a) (integer? L)]}
@@ -254,14 +283,9 @@
           (reduce +-exp)
           (exp-result)))))
 
-(defn model-check
-  "At first, make model from dataset as a train-dataset, then it validate accuracy of model using dataset as a test-dataset."
-  ([dataset L]
-   {:pre [(instance? DataSet dataset) (integer? L)]
-    :post [(map? %)]}
-   (p :model-check
-      (let [norm-dataset (DataSet. (:classes dataset) (data/normalize (:features dataset)))]
-        (train-to-eval L norm-dataset norm-dataset)))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; main
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn -main [& args]
   {:pre [(string? (first args))]}
